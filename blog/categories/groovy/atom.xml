@@ -1,100 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
 
-<!DOCTYPE html>
-<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
-<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
-<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <title>My Octopress Blog</title>
-  <meta name="author" content="Stefan Eletzhofer">
-
-  
-  <meta name="description" content="In my constant task to hone and resharpen my tools, I&#8217;ve started some experiments
-with groovy. Groovy is a scripting language which runs on top &hellip;">
-  
-
-  <!-- http://t.co/dKP3o1e -->
-  <meta name="HandheldFriendly" content="True">
-  <meta name="MobileOptimized" content="320">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  
-  <link rel="canonical" href="http://seletz.github.com">
-  <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
-  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-
-  
-
-</head>
-
-<body   >
-  <header role="banner"><hgroup>
-  <h1><a href="/">My Octopress Blog</a></h1>
-  
-    <h2>my personal blog</h2>
-  
-</hgroup>
-
-</header>
-  <nav role="navigation"><ul class="subscription" data-subscription="rss">
-  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
-  
-</ul>
-  
-<form action="http://google.com/search" method="get">
-  <fieldset role="search">
-    <input type="hidden" name="q" value="site:seletz.github.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-  </fieldset>
-</form>
-  
-<ul class="main-navigation">
-  <li><a href="/">Blog</a></li>
-  <li><a href="/blog/archives">Archives</a></li>
-</ul>
-
-</nav>
-  <div id="main">
-    <div id="content">
-      <div class="blog-index">
-  
-  
-  
-    <article>
-      
-  <header>
+  <title><![CDATA[Category: groovy | My Octopress Blog]]></title>
+  <link href="http://seletz.github.com/blog/categories/groovy/atom.xml" rel="self"/>
+  <link href="http://seletz.github.com/"/>
+  <updated>2012-01-05T19:48:08+01:00</updated>
+  <id>http://seletz.github.com/</id>
+  <author>
+    <name><![CDATA[Stefan Eletzhofer]]></name>
     
-      <h1 class="entry-title"><a href="/blog/2012/01/05/experiments-with-groovy/">Experiments With Groovy</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
 
   
-
-
-<time datetime="2012-01-05T17:30:00+01:00" pubdate data-updated="true">2012-01-05</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>In my constant task to hone and resharpen my tools, I&#8217;ve started some experiments
+  <entry>
+    <title type="html"><![CDATA[experiments with groovy]]></title>
+    <link href="http://seletz.github.com/blog/2012/01/05/experiments-with-groovy/"/>
+    <updated>2012-01-05T17:30:00+01:00</updated>
+    <id>http://seletz.github.com/blog/2012/01/05/experiments-with-groovy</id>
+    <content type="html"><![CDATA[<p>In my constant task to hone and resharpen my tools, I've started some experiments
 with <strong>groovy</strong>.</p>
 
 <p>Groovy is a scripting language which runs on top of the <em>JVM</em> like <em>Jython</em> or <em>jRuby</em>.  But
@@ -107,7 +31,7 @@ modern and hip cousins <strong>clojure</strong> and <strong>scala</strong>.</p>
 
 <p>So what does it look like?  Grok this:</p>
 
-<figure class='code'><figcaption><span>maps, adding and iterating over items (mapkeys.groovy)</span> <a href='/downloads/code/groovy/mapkeys.groovy'>download</a></figcaption>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>maps, adding and iterating over items (mapkeys.groovy)</span> <a href='/downloads/code/groovy/mapkeys.groovy'>download</a></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -128,25 +52,24 @@ modern and hip cousins <strong>clojure</strong> and <strong>scala</strong>.</p>
 </span><span class='line'><span class="n">map</span><span class="o">[</span><span class="s">&quot;yet another key&quot;</span><span class="o">]</span> <span class="o">=</span> <span class="s">&quot;bar&quot;</span>
 </span><span class='line'>
 </span><span class='line'><span class="n">map</span><span class="o">.</span><span class="na">each</span> <span class="o">{</span> <span class="n">item</span> <span class="o">-&gt;</span>
-</span><span class='line'>  <span class="n">println</span> <span class="s">&quot;$item.key =&gt; $item.value&quot;</span>
+</span><span class='line'>	<span class="n">println</span> <span class="s">&quot;$item.key =&gt; $item.value&quot;</span>
 </span><span class='line'><span class="o">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="c1">// implicit maps</span>
 </span><span class='line'><span class="n">def</span> <span class="n">errors</span> <span class="o">=</span> <span class="o">[</span> <span class="nl">EINVAL:</span> <span class="o">-</span><span class="mi">1</span><span class="o">,</span> <span class="nl">ENOSPC:</span> <span class="o">-</span><span class="mi">3</span><span class="o">,</span> <span class="nl">EPROTO:</span> <span class="o">-</span><span class="mi">42</span><span class="o">]</span> <span class="c1">// just some example</span>
 </span><span class='line'><span class="n">println</span> <span class="n">errors</span><span class="o">.</span><span class="na">EINVAL</span>  <span class="c1">// -1</span>
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-
-<p>(note: I did&#8217;nt succeed in getting the groovy lexer running in pygments and octopress, so
+<p>(note: I did'nt succeed in getting the groovy lexer running in pygments and octopress, so
 no syntax coloring. oh well.)</p>
 
 <p>This looks pretty readable to me!</p>
 
-<h2>classes, closures, iterators &#8211; oh my</h2>
+<h2>classes, closures, iterators -- oh my</h2>
 
-<p><strong>groovy</strong> is fully OO &#8211; grok this:</p>
+<p><strong>groovy</strong> is fully OO -- grok this:</p>
 
-<figure class='code'><figcaption><span>maps, adding and iterating over items (mapkeys.groovy)</span> <a href='/downloads/code/groovy/mapkeys.groovy'>download</a></figcaption>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>maps, adding and iterating over items (mapkeys.groovy)</span> <a href='/downloads/code/groovy/mapkeys.groovy'>download</a></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -167,18 +90,17 @@ no syntax coloring. oh well.)</p>
 </span><span class='line'><span class="n">map</span><span class="o">[</span><span class="s">&quot;yet another key&quot;</span><span class="o">]</span> <span class="o">=</span> <span class="s">&quot;bar&quot;</span>
 </span><span class='line'>
 </span><span class='line'><span class="n">map</span><span class="o">.</span><span class="na">each</span> <span class="o">{</span> <span class="n">item</span> <span class="o">-&gt;</span>
-</span><span class='line'>  <span class="n">println</span> <span class="s">&quot;$item.key =&gt; $item.value&quot;</span>
+</span><span class='line'>	<span class="n">println</span> <span class="s">&quot;$item.key =&gt; $item.value&quot;</span>
 </span><span class='line'><span class="o">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="c1">// implicit maps</span>
 </span><span class='line'><span class="n">def</span> <span class="n">errors</span> <span class="o">=</span> <span class="o">[</span> <span class="nl">EINVAL:</span> <span class="o">-</span><span class="mi">1</span><span class="o">,</span> <span class="nl">ENOSPC:</span> <span class="o">-</span><span class="mi">3</span><span class="o">,</span> <span class="nl">EPROTO:</span> <span class="o">-</span><span class="mi">42</span><span class="o">]</span> <span class="c1">// just some example</span>
 </span><span class='line'><span class="n">println</span> <span class="n">errors</span><span class="o">.</span><span class="na">EINVAL</span>  <span class="c1">// -1</span>
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
+<p>The block enclosed in curly braces is a <em>closure</em>.  They're objects, too:</p>
 
-<p>The block enclosed in curly braces is a <em>closure</em>.  They&#8217;re objects, too:</p>
-
-<figure class='code'><figcaption><span>fun with closures (closure.groovy)</span> <a href='/downloads/code/groovy/closure.groovy'>download</a></figcaption>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>fun with closures (closure.groovy)</span> <a href='/downloads/code/groovy/closure.groovy'>download</a></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -226,12 +148,12 @@ no syntax coloring. oh well.)</p>
 </span><span class='line'>
 </span><span class='line'><span class="c1">// we can also accept a closure as a parameter</span>
 </span><span class='line'><span class="n">def</span> <span class="nf">when</span><span class="o">(</span><span class="n">condition</span><span class="o">,</span> <span class="n">closure</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">condition</span><span class="o">)</span>
-</span><span class='line'>      <span class="n">closure</span><span class="o">()</span>
+</span><span class='line'>	<span class="k">if</span> <span class="o">(</span><span class="n">condition</span><span class="o">)</span>
+</span><span class='line'>		<span class="n">closure</span><span class="o">()</span>
 </span><span class='line'><span class="o">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="n">when</span> <span class="o">(</span><span class="mi">4</span><span class="o">&lt;</span><span class="mi">5</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">println</span> <span class="s">&quot;yay!&quot;</span>
+</span><span class='line'>	<span class="n">println</span> <span class="s">&quot;yay!&quot;</span>
 </span><span class='line'><span class="o">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="n">def</span> <span class="n">local</span> <span class="o">=</span> <span class="mi">2</span>
@@ -242,8 +164,8 @@ no syntax coloring. oh well.)</p>
 </span><span class='line'><span class="n">println</span> <span class="s">&quot;test(2) =&gt; ${test(2)}&quot;</span> <span class="c1">// test(2) =&gt; 5</span>
 </span><span class='line'>
 </span><span class='line'><span class="n">def</span> <span class="n">test2</span> <span class="o">=</span> <span class="o">{</span> <span class="n">x</span> <span class="o">-&gt;</span>
-</span><span class='line'>  <span class="n">def</span> <span class="n">local2</span> <span class="o">=</span> <span class="n">x</span>
-</span><span class='line'>  <span class="k">return</span> <span class="o">{</span> <span class="n">k</span> <span class="o">-&gt;</span> <span class="n">k</span> <span class="o">+</span> <span class="n">local2</span> <span class="o">}</span>
+</span><span class='line'>	<span class="n">def</span> <span class="n">local2</span> <span class="o">=</span> <span class="n">x</span>
+</span><span class='line'>	<span class="k">return</span> <span class="o">{</span> <span class="n">k</span> <span class="o">-&gt;</span> <span class="n">k</span> <span class="o">+</span> <span class="n">local2</span> <span class="o">}</span>
 </span><span class='line'><span class="o">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="n">def</span> <span class="n">test_2</span> <span class="o">=</span> <span class="n">test2</span><span class="o">(</span><span class="mi">2</span><span class="o">)</span>
@@ -251,13 +173,12 @@ no syntax coloring. oh well.)</p>
 </span><span class='line'>
 </span><span class='line'><span class="n">println</span> <span class="s">&quot;test_2(2) =&gt; ${test_2(2)}&quot;</span> <span class="c1">// test_2(2) =&gt; 4</span>
 </span><span class='line'><span class="n">println</span> <span class="s">&quot;test_3(2) =&gt; ${test_3(2)}&quot;</span> <span class="c1">// test_3(2) =&gt; 5</span>
-</span></code></pre></td></tr></table></div></figure>
-
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>Another nice thing is how classes are defined and how <strong>groovy</strong> creates automatic
 constructors:</p>
 
-<figure class='code'><figcaption><span>classes and constructors (class.groovy)</span> <a href='/downloads/code/groovy/class.groovy'>download</a></figcaption>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>classes and constructors (class.groovy)</span> <a href='/downloads/code/groovy/class.groovy'>download</a></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -279,8 +200,8 @@ constructors:</p>
 <span class='line-number'>19</span>
 </pre></td><td class='code'><pre><code class='java'><span class='line'><span class="c1">// a simple class.   Note that we do not define a constructor.</span>
 </span><span class='line'><span class="kd">class</span> <span class="nc">Person</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="n">name</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">Integer</span> <span class="n">age</span>
+</span><span class='line'>	<span class="kd">public</span> <span class="n">String</span> <span class="n">name</span>
+</span><span class='line'>	<span class="kd">public</span> <span class="n">Integer</span> <span class="n">age</span>
 </span><span class='line'><span class="o">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="n">def</span> <span class="n">anonymous</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Person</span><span class="o">()</span>
@@ -296,96 +217,17 @@ constructors:</p>
 </span><span class='line'><span class="c1">// coerce a map to a class.  Will call named-arg automatic ctor</span>
 </span><span class='line'><span class="n">def</span> <span class="n">maja</span> <span class="o">=</span> <span class="o">[</span><span class="nl">name:</span><span class="s">&quot;Maja&quot;</span><span class="o">,</span> <span class="nl">age:</span><span class="mi">8</span><span class="o">]</span> <span class="n">as</span> <span class="n">Person</span>
 </span><span class='line'><span class="n">println</span> <span class="s">&quot;${maja.name} is ${maja.age} years old.&quot;</span> <span class="c1">// maja is 8 years old.</span>
-</span></code></pre></td></tr></table></div></figure>
-
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>Notice how we did <strong>not</strong> need to specify getter and setter methods.  Also notice
 how <strong>groovy</strong> uses named arguments!</p>
 
-<h2>What&#8217;s next?</h2>
+<h2>What's next?</h2>
 
-<p>Well.  Next up, I&#8217;ll try to get some <code>PDMlink</code> stuff working with <strong>groovy</strong>.</p>
+<p>Well.  Next up, I'll try to get some <code>PDMlink</code> stuff working with <strong>groovy</strong>.</p>
 
 <h2>Links</h2>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
-</div>
-<aside class="sidebar">
-  
-    <section>
-  <h1>Recent Posts</h1>
-  <ul id="recent_posts">
-    
-      <li class="post">
-        <a href="/blog/2012/01/05/experiments-with-groovy/">experiments with groovy</a>
-      </li>
-    
-  </ul>
-</section>
-
-
-<section>
-  <h1>Latest Tweets</h1>
-  <ul id="tweets">
-    <li class="loading">Status updating&#8230;</li>
-  </ul>
-  <script type="text/javascript">
-    $.domReady(function(){
-      getTwitterFeed("seletz", 4, false);
-    });
-  </script>
-  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
-  
-    <a href="http://twitter.com/seletz" class="twitter-follow-button" data-show-count="false">Follow @seletz</a>
-  
-</section>
-
-
-
-
-
-  
-</aside>
-
-    </div>
-  </div>
-  <footer role="contentinfo"><p>
-  Copyright &copy; 2012 - Stefan Eletzhofer -
-  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
-</p>
-
-</footer>
-  
-
-
-
-
-
-
-
-  <script type="text/javascript">
-    (function(){
-      var twitterWidgets = document.createElement('script');
-      twitterWidgets.type = 'text/javascript';
-      twitterWidgets.async = true;
-      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
-      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
-    })();
-  </script>
-
-
-
-
-
-</body>
-</html>
+</feed>
