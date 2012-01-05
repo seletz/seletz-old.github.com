@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://seletz.github.com/atom.xml" rel="self"/>
   <link href="http://seletz.github.com/"/>
-  <updated>2012-01-05T19:48:08+01:00</updated>
+  <updated>2012-01-05T20:01:35+01:00</updated>
   <id>http://seletz.github.com/</id>
   <author>
     <name><![CDATA[Stefan Eletzhofer]]></name>
@@ -231,6 +231,9 @@ how <strong>groovy</strong> uses named arguments!</p>
 <p>Well.  Next up, I&#8217;ll try to get some <code>PDMlink</code> stuff working with <strong>groovy</strong>.</p>
 
 <h2>Links</h2>
+
+<p>You can find <strong>groovy</strong> documentation at <a href="http://groovy.codehaus.org/" title="Groovy at codehaus">codehaus</a>.  There&#8217;s also a zone
+over at <a href="http://groovy.dzone.com/">dzone</a>.</p>
 ]]></content>
   </entry>
   
