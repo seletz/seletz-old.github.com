@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://seletz.github.com/atom.xml" rel="self"/>
   <link href="http://seletz.github.com/"/>
-  <updated>2012-01-05T20:01:35+01:00</updated>
+  <updated>2012-01-06T12:51:51+01:00</updated>
   <id>http://seletz.github.com/</id>
   <author>
     <name><![CDATA[Stefan Eletzhofer]]></name>
@@ -233,7 +233,9 @@ how <strong>groovy</strong> uses named arguments!</p>
 <h2>Links</h2>
 
 <p>You can find <strong>groovy</strong> documentation at <a href="http://groovy.codehaus.org/" title="Groovy at codehaus">codehaus</a>.  There&#8217;s also a zone
-over at <a href="http://groovy.dzone.com/">dzone</a>.</p>
+over at <a href="http://groovy.dzone.com/" title="Groovy Zone">dzone</a>.</p>
+
+<p>There&#8217;s also a API documentation of the <a href="http://groovy.codehaus.org/api/overview-summary.html" title="Groovy JDK">groovy JDK</a>.</p>
 ]]></content>
   </entry>
   
