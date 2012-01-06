@@ -57,7 +57,10 @@ Links
 You can find **groovy** documentation at [codehaus] [1].  There's also a zone
 over at [dzone] [2].
 
+There's also a API documentation of the [groovy JDK] [3].
+
   [1]: http://groovy.codehaus.org/      "Groovy at codehaus"
-  [2]: http://groovy.dzone.com/  	"Groovy Zone
+  [2]: http://groovy.dzone.com/  	"Groovy Zone"
+  [3]: http://groovy.codehaus.org/api/overview-summary.html  	"Groovy JDK"
 
 
