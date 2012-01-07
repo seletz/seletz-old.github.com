@@ -4,7 +4,7 @@
   <title><![CDATA[Category: code | My Octopress Blog]]></title>
   <link href="http://seletz.github.com/blog/categories/code/atom.xml" rel="self"/>
   <link href="http://seletz.github.com/"/>
-  <updated>2012-01-06T12:51:51+01:00</updated>
+  <updated>2012-01-07T13:56:52+01:00</updated>
   <id>http://seletz.github.com/</id>
   <author>
     <name><![CDATA[Stefan Eletzhofer]]></name>
@@ -20,6 +20,9 @@
     <id>http://seletz.github.com/blog/2012/01/05/experiments-with-groovy</id>
     <content type="html"><![CDATA[<p>In my constant task to hone and resharpen my tools, I've started some experiments
 with <strong>groovy</strong>.</p>
+
+<!-- more -->
+
 
 <p>Groovy is a scripting language which runs on top of the <em>JVM</em> like <em>Jython</em> or <em>jRuby</em>.  But
 unlike other scripting languages, <strong>groovy</strong> classes are full-blown Java classes and can be used
