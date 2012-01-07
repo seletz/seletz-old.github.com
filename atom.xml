@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://seletz.github.com/atom.xml" rel="self"/>
   <link href="http://seletz.github.com/"/>
-  <updated>2012-01-07T13:56:52+01:00</updated>
+  <updated>2012-01-07T13:57:48+01:00</updated>
   <id>http://seletz.github.com/</id>
   <author>
     <name><![CDATA[Stefan Eletzhofer]]></name>
@@ -12,6 +12,213 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[switch from bash to zsh]]></title>
+    <link href="http://seletz.github.com/blog/2012/01/06/switch-from-bash-to-zsh/"/>
+    <updated>2012-01-06T13:03:00+01:00</updated>
+    <id>http://seletz.github.com/blog/2012/01/06/switch-from-bash-to-zsh</id>
+    <content type="html"><![CDATA[<p>I finally came around to switch from <code>bash</code> to <code>zsh</code>.  While reading <a href="https://news.ycombinator.com" title="hackernews">hacker news</a>
+I found a nice little setup on <em>github</em>: <a href="https://github.com/robbyrussell/oh-my-zsh" title="oh-my-zsh">oh-my-zsh</a></p>
+
+<!-- more -->
+
+
+<h2>Installation</h2>
+
+<p>Installation was quite easy:</p>
+
+<pre><code>$ brew install zsh
+$ cd $HOME
+$ git clone https://github.com/robbyrussell/oh-my-zsh.git .oh-my-zsh
+$ sudo chsh zsh
+</code></pre>
+
+<h2>Configuration</h2>
+
+<p>I did very little configuration.  All I really did is to choose a nice
+theme from the many available themes.  Anyhow, my <code>.zshrc</code> looks like this:</p>
+
+<figure class='code'><figcaption><span>.zshrc (zshrc)</span> <a href='http://seletz.github.com/downloads/code/shell/zshrc'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># Path to your oh-my-zsh configuration.</span>
+</span><span class='line'><span class="nv">ZSH</span><span class="o">=</span><span class="nv">$HOME</span>/.oh-my-zsh
+</span><span class='line'>
+</span><span class='line'><span class="c"># Set name of the theme to load.</span>
+</span><span class='line'><span class="c"># Look in ~/.oh-my-zsh/themes/</span>
+</span><span class='line'><span class="c"># Optionally, if you set this to &quot;random&quot;, it&#39;ll load a random theme each</span>
+</span><span class='line'><span class="c"># time that oh-my-zsh is loaded.</span>
+</span><span class='line'><span class="nv">ZSH_THEME</span><span class="o">=</span><span class="s2">&quot;nanotech&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Example aliases</span>
+</span><span class='line'><span class="c"># alias zshconfig=&quot;mate ~/.zshrc&quot;</span>
+</span><span class='line'><span class="c"># alias ohmyzsh=&quot;mate ~/.oh-my-zsh&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Set to this to use case-sensitive completion</span>
+</span><span class='line'><span class="c"># CASE_SENSITIVE=&quot;true&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Comment this out to disable weekly auto-update checks</span>
+</span><span class='line'><span class="c"># DISABLE_AUTO_UPDATE=&quot;true&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Uncomment following line if you want to disable colors in ls</span>
+</span><span class='line'><span class="c"># DISABLE_LS_COLORS=&quot;true&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Uncomment following line if you want to disable autosetting terminal title.</span>
+</span><span class='line'><span class="c"># DISABLE_AUTO_TITLE=&quot;true&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Uncomment following line if you want red dots to be displayed while waiting for completion</span>
+</span><span class='line'><span class="c"># COMPLETION_WAITING_DOTS=&quot;true&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)</span>
+</span><span class='line'><span class="c"># Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/</span>
+</span><span class='line'><span class="c"># Example format: plugins=(rails git textmate ruby lighthouse)</span>
+</span><span class='line'><span class="nv">plugins</span><span class="o">=(</span>osx git git-flow fabric groovy grails python<span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">source</span> <span class="nv">$ZSH</span>/oh-my-zsh.sh
+</span><span class='line'>
+</span><span class='line'><span class="c"># Customize to your needs...</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#---------------------------------------------------------------------</span>
+</span><span class='line'><span class="c"># prompt and path</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span>~/bin:/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:<span class="nv">$PATH</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#---------------------------------------------------------------------</span>
+</span><span class='line'><span class="c"># env setup</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">LANG</span><span class="o">=</span><span class="s2">&quot;de_DE.UTF-8&quot;</span>
+</span><span class='line'><span class="c"># gnuchlog vim plugin</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">EMAIL</span><span class="o">=</span><span class="s2">&quot;Stefan Eletzhofer &lt;stefan.eletzhofer@nexiles.de&gt;&quot;</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">EDITOR</span><span class="o">=</span><span class="s2">&quot;/Applications/MacVim.app/Contents/MacOS/Vim -g -f &quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#---------------------------------------------------------------------</span>
+</span><span class='line'><span class="c"># python</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">PYTHONSTARTUP</span><span class="o">=</span>~/.pyinit
+</span><span class='line'>
+</span><span class='line'><span class="nb">export </span><span class="nv">VIRTUALENVWRAPPER_PYTHON</span><span class="o">=</span>/usr/bin/python2.6
+</span><span class='line'><span class="nb">export </span><span class="nv">WORKON_HOME</span><span class="o">=</span>~/.virtualenvs
+</span><span class='line'><span class="nb">export </span><span class="nv">PROJECT_HOME</span><span class="o">=</span><span class="nv">$HOME</span>/develop
+</span><span class='line'><span class="nb">export </span><span class="nv">VIRTUALENV_ROOT</span><span class="o">=</span><span class="nv">$WORKON_HOME</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">export </span><span class="nv">JYTHON_HOME</span><span class="o">=</span><span class="k">$(</span>brew --prefix jython<span class="k">)</span>/libexec
+</span><span class='line'><span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:<span class="nv">$JYTHON_HOME</span>/bin
+</span><span class='line'>
+</span><span class='line'>. /usr/local/bin/virtualenvwrapper.sh
+</span><span class='line'>
+</span><span class='line'><span class="c">#---------------------------------------------------------------------</span>
+</span><span class='line'><span class="c"># NODE.JS</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">NODE_PATH</span><span class="o">=</span>/usr/local/lib/node
+</span><span class='line'><span class="nb">export </span><span class="nv">JS_CMD</span><span class="o">=</span>node
+</span><span class='line'>
+</span><span class='line'><span class="c">#---------------------------------------------------------------------</span>
+</span><span class='line'><span class="c"># Ruby RVM</span>
+</span><span class='line'><span class="nb">source</span> ~/.rvm/scripts/rvm
+</span><span class='line'>
+</span><span class='line'><span class="c">#---------------------------------------------------------------------</span>
+</span><span class='line'><span class="c"># GROOVY</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">GROOVY_HOME</span><span class="o">=</span><span class="k">$(</span>brew --prefix groovy<span class="k">)</span>/libexec
+</span><span class='line'>
+</span><span class='line'><span class="c">#---------------------------------------------------------------------</span>
+</span><span class='line'><span class="c"># alias</span>
+</span><span class='line'><span class="nb">alias </span><span class="nv">ls</span><span class="o">=</span><span class="s2">&quot;gls --color&quot;</span>
+</span><span class='line'><span class="nb">alias </span><span class="nv">la</span><span class="o">=</span><span class="s2">&quot;ls -la&quot;</span>
+</span><span class='line'><span class="nb">alias </span><span class="nv">ll</span><span class="o">=</span><span class="s2">&quot;ls -l&quot;</span>
+</span><span class='line'><span class="nb">alias </span><span class="nv">serve</span><span class="o">=</span><span class="s2">&quot;python -mSimpleHTTPServer&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#---------------------------------------------------------------------</span>
+</span><span class='line'><span class="c"># direnv hook</span>
+</span><span class='line'><span class="nb">eval</span> <span class="sb">`</span>direnv hook <span class="nv">$0</span><span class="sb">`</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here&#8217;s how my terminal looks like now.  I&#8217;m using the <a href="http://ethanschoonover.com/solarized" title="solarized">solarized</a> colour scheme,
+and i&#8217;m using the <code>nanotech</code> theme:</p>
+
+<p><img class="center" src="http://dl.dropbox.com/u/154097/blog-images/zsh-theme.jpg" title="my zsh theme" alt="zsh terminal screenshot"></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[experiments with groovy]]></title>
