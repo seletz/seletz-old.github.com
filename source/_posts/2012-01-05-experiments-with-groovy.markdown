@@ -10,6 +10,8 @@ published: true
 In my constant task to hone and resharpen my tools, I've started some experiments
 with **groovy**.
 
+<!-- more -->
+
 Groovy is a scripting language which runs on top of the *JVM* like *Jython* or *jRuby*.  But
 unlike other scripting languages, **groovy** classes are full-blown Java classes and can be used
 within plain Java.  Also, any Java package can be used in groovy without writing bridges and
