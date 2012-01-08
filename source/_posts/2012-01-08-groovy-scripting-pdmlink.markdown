@@ -4,7 +4,7 @@ title: "groovy: scripting PDMlink"
 date: 2012-01-08 20:33
 comments: true
 categories: 
-published: false
+published: true
 ---
 
 In this post I'll explore how `groovy` may be used to script `Windchill PDMlink`.
