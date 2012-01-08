@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://seletz.github.com/atom.xml" rel="self"/>
   <link href="http://seletz.github.com/"/>
-  <updated>2012-01-08T21:57:45+01:00</updated>
+  <updated>2012-01-08T22:06:23+01:00</updated>
   <id>http://seletz.github.com/</id>
   <author>
     <name><![CDATA[Stefan Eletzhofer]]></name>
@@ -12,6 +12,285 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[groovy: scripting PDMlink]]></title>
+    <link href="http://seletz.github.com/blog/2012/01/08/groovy-scripting-pdmlink/"/>
+    <updated>2012-01-08T20:33:00+01:00</updated>
+    <id>http://seletz.github.com/blog/2012/01/08/groovy-scripting-pdmlink</id>
+    <content type="html"><![CDATA[<p>In this post I&#8217;ll explore how <code>groovy</code> may be used to script <code>Windchill PDMlink</code>.</p>
+
+<!-- more -->
+
+
+<h2>Setting up the classpath</h2>
+
+<p>To have acces sto the <code>PDMlink</code> libraries, I&#8217;ll add a locally mounted <code>codebase</code>
+directory to the <code>$CLASSPATH</code>:</p>
+
+<pre><code>$ echo $WT_HOME
+/Volumes/settr-vm-ptc/Windchill
+$ wtclasspath
+export CLASSPATH=:/Volumes/settr-vm-ptc/Windchill/codebas...
+$ $(wtclasspath)
+</code></pre>
+
+<p>The <code>wtclasspath</code>script looks like this:</p>
+
+<figure class='code'><figcaption><span>wtclasspath (wtclasspath)</span> <a href='http://seletz.github.com/downloads/code/shell/wtclasspath'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">function </span>setup_classpath<span class="o">()</span>
+</span><span class='line'><span class="o">{</span>
+</span><span class='line'>  <span class="k">for </span>jar in <span class="k">$(</span>find <span class="nv">$WT_HOME</span>/codebase/WEB-INF -name <span class="s2">&quot;*.jar&quot;</span><span class="k">)</span>; <span class="k">do</span>
+</span><span class='line'><span class="k">      </span><span class="nv">cp</span><span class="o">=</span><span class="nv">$cp</span>:<span class="nv">$jar</span>
+</span><span class='line'>  <span class="k">done</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>setup_classpath
+</span><span class='line'>
+</span><span class='line'><span class="nb">echo</span> <span class="s2">&quot;export CLASSPATH=$cp:$WT_HOME/codebase&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Logging In</h2>
+
+<p>To log in, we need to fetch the <code>RemoteMethodServer</code> and set username and password:</p>
+
+<figure class='code'><figcaption><span>logging in (wt_login.groovy)</span> <a href='http://seletz.github.com/downloads/code/groovy/wt_login.groovy'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">wt.method.RemoteMethodServer</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">ms</span> <span class="o">=</span> <span class="n">RemoteMethodServer</span><span class="o">.</span><span class="na">getDefault</span><span class="o">()</span>
+</span><span class='line'><span class="n">ms</span><span class="o">.</span><span class="na">setUserName</span><span class="o">(</span><span class="s">&quot;orgadmin&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="n">ms</span><span class="o">.</span><span class="na">setPassword</span><span class="o">(</span><span class="s">&quot;orgadmin&quot;</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After this, we&#8217;re able to use the <strong>windchill API</strong>.</p>
+
+<h2>Fetching PDMlink Business Objects by Reference</h2>
+
+<p>Fetching a business object using it&#8217;s <em>Object Reference String</em> translates
+also quite well to groovy:</p>
+
+<figure class='code'><figcaption><span>fetch a object (wt_docinfo.groovy)</span> <a href='http://seletz.github.com/downloads/code/groovy/wt_docinfo.groovy'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">wt.method.RemoteMethodServer</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">com.ptc.wvs.server.util.PublishUtils</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="n">def</span> <span class="nf">login</span><span class="o">(</span><span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">ms</span> <span class="o">=</span> <span class="n">RemoteMethodServer</span><span class="o">.</span><span class="na">getDefault</span><span class="o">()</span>
+</span><span class='line'>    <span class="n">ms</span><span class="o">.</span><span class="na">setUserName</span><span class="o">(</span><span class="n">args</span><span class="o">.</span><span class="na">user</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">ms</span><span class="o">.</span><span class="na">setPassword</span><span class="o">(</span><span class="n">args</span><span class="o">.</span><span class="na">password</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="n">ms</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">def</span> <span class="n">getObjectFromOR</span> <span class="o">=</span> <span class="o">{</span> <span class="n">oid</span> <span class="o">-&gt;</span>
+</span><span class='line'>    <span class="n">PublishUtils</span><span class="o">.</span><span class="na">getObjectFromRef</span><span class="o">(</span><span class="n">oid</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">def</span> <span class="n">getORFromObject</span> <span class="o">=</span> <span class="o">{</span> <span class="n">obj</span> <span class="o">-&gt;</span>
+</span><span class='line'>    <span class="n">PublishUtils</span><span class="o">.</span><span class="na">getRefFromObject</span><span class="o">(</span><span class="n">obj</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// log in</span>
+</span><span class='line'><span class="n">login</span><span class="o">(</span><span class="nl">user:</span> <span class="s">&quot;orgadmin&quot;</span><span class="o">,</span> <span class="nl">password:</span> <span class="s">&quot;orgadmin&quot;</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// fetch a object by using a OR</span>
+</span><span class='line'><span class="n">def</span> <span class="n">oid</span> <span class="o">=</span> <span class="s">&quot;VR:wt.epm.EPMDocument:8483330&quot;</span>
+</span><span class='line'><span class="n">def</span> <span class="n">doc</span> <span class="o">=</span> <span class="n">getObjectFromOR</span><span class="o">(</span><span class="n">oid</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// We&#39;re able to access the properties of the EPMDocument</span>
+</span><span class='line'><span class="n">println</span> <span class="s">&quot;${doc.displayIdentifier} [${doc.state} ${doc.type}] ${getORFromObject(doc)}&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// for the &quot;inspact last&quot; feature of groovyConsole </span>
+</span><span class='line'><span class="k">return</span> <span class="n">doc</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Running this script is easy:</p>
+
+<pre><code>$ groovy -cp $CLASSPATH wt_docinfo.groovy
+k06__core-coil_cc0000000.asm, -.17 [RELEASED CAD-Dokument] OR:wt.epm.EPMDocument:112511174
+</code></pre>
+
+<p>But this is all quite basic, and not using the <strong>groovy</strong> language features very much at all.</p>
+
+<h2>Fetching all iterations of an object</h2>
+
+<p>Now we&#8217;re going to use the <code>VersionControlHelper</code> service to fetch all iterations of an
+object and print some information.  Please note how <strong>groovy</strong> makes it easy to traverse
+collections using <code>each</code> and a <em>closure</em>.  Also note the <code>import ... as ...</code>:</p>
+
+<figure class='code'><figcaption><span>printing iteration history (wt_iterations.groovy)</span> <a href='http://seletz.github.com/downloads/code/groovy/wt_iterations.groovy'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">wt.method.RemoteMethodServer</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">com.ptc.wvs.server.util.PublishUtils</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">wt.vc.VersionControlHelper</span> <span class="n">as</span> <span class="n">VCH</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">def</span> <span class="nf">login</span><span class="o">(</span><span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">ms</span> <span class="o">=</span> <span class="n">RemoteMethodServer</span><span class="o">.</span><span class="na">getDefault</span><span class="o">()</span>
+</span><span class='line'>    <span class="n">ms</span><span class="o">.</span><span class="na">setUserName</span><span class="o">(</span><span class="n">args</span><span class="o">.</span><span class="na">user</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">ms</span><span class="o">.</span><span class="na">setPassword</span><span class="o">(</span><span class="n">args</span><span class="o">.</span><span class="na">password</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="n">ms</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">def</span> <span class="nf">getObjectFromOR</span><span class="o">(</span><span class="n">oid</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">PublishUtils</span><span class="o">.</span><span class="na">getObjectFromRef</span><span class="o">(</span><span class="n">oid</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">def</span> <span class="nf">getORFromObject</span><span class="o">(</span><span class="n">obj</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">PublishUtils</span><span class="o">.</span><span class="na">getRefFromObject</span><span class="o">(</span><span class="n">obj</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">def</span> <span class="nf">info</span><span class="o">(</span><span class="n">doc</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="s">&quot;${doc.displayIdentifier} [${doc.state} ${doc.type}] ${getORFromObject(doc)}&quot;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// log in</span>
+</span><span class='line'><span class="n">login</span><span class="o">(</span><span class="nl">user:</span> <span class="s">&quot;orgadmin&quot;</span><span class="o">,</span> <span class="nl">password:</span> <span class="s">&quot;orgadmin&quot;</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// fetch a object by using a OR</span>
+</span><span class='line'><span class="n">def</span> <span class="n">oid</span> <span class="o">=</span> <span class="s">&quot;VR:wt.epm.EPMDocument:8483330&quot;</span>
+</span><span class='line'><span class="n">def</span> <span class="n">doc</span> <span class="o">=</span> <span class="n">getObjectFromOR</span><span class="o">(</span><span class="n">oid</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">VCH</span><span class="o">.</span><span class="na">service</span><span class="o">.</span><span class="na">allIterationsOf</span><span class="o">(</span><span class="n">doc</span><span class="o">.</span><span class="na">master</span><span class="o">).</span><span class="na">each</span> <span class="o">{</span> <span class="n">obj</span> <span class="o">-&gt;</span>
+</span><span class='line'>    <span class="n">println</span> <span class="nf">info</span><span class="o">(</span><span class="n">obj</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The output:</p>
+
+<pre><code>$ groovy -cp $CLASSPATH wt_iterations.groovy
+k06__core-coil_cc0000000.asm, -.17 [RELEASED CAD-Dokument] OR:wt.epm.EPMDocument:112511174
+k06__core-coil_cc0000000.asm, -.16 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:105876837
+k06__core-coil_cc0000000.asm, -.15 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:95189959
+k06__core-coil_cc0000000.asm, -.14 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:86656605
+k06__core-coil_cc0000000.asm, -.13 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:67720806
+k06__core-coil_cc0000000.asm, -.12 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:57847775
+k06__core-coil_cc0000000.asm, -.11 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:46825566
+k06__core-coil_cc0000000.asm, -.10 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:44606524
+k06__core-coil_cc0000000.asm, -.9 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:39832260
+k06__core-coil_cc0000000.asm, -.8 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:31441018
+k06__core-coil_cc0000000.asm, -.7 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:31417993
+k06__core-coil_cc0000000.asm, -.6 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:30833875
+k06__core-coil_cc0000000.asm, -.5 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:28909290
+k06__core-coil_cc0000000.asm, -.4 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:11014342
+</code></pre>
+
+<p>Cool, eh?  The code <em>almost</em> looks like <strong>coffee script</strong> to me!</p>
+
+<h2>Using the GroovyConsole and the Object Browser</h2>
+
+<p>I&#8217;m no big fan of using heavy UIs when programming &#8211; I&#8217;m a avid user of <em>MacVIM</em> after all &#8211; but
+being able to <em>explore</em> live-objects sounded at least interesting to me.</p>
+
+<p>So, I fired up the <code>groovyConsole</code>:</p>
+
+<pre><code>$ groovyConsole -cp $CLASSPATH wt_docinfo.groovy 
+</code></pre>
+
+<p><img class="center" src="http://dl.dropbox.com/u/154097/blog-images/groovy-object-browser.jpg" title="browsing a EPMDocument" alt="groovy object browser"></p>
+
+<h2>Conclusion</h2>
+
+<p>The experiments so far have been promising.  What I want to explore further is:</p>
+
+<ul>
+<li>runtime performance compared to <strong>jython</strong></li>
+<li>importing <strong>groovy</strong> classes in java (should be a no-brainer)</li>
+<li>creating a servlet using <strong>groovy</strong>, using <code>Groovy Server Pages</code></li>
+<li>all of the above together in the <strong>Windchill</strong> context</li>
+<li>doing a side-by-side comparsion of <strong>jython</strong> and <strong>groovy</strong> code</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[switch from bash to zsh]]></title>

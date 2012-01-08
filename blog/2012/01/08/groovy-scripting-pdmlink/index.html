@@ -1,0 +1,575 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>groovy: scripting PDMlink - My Octopress Blog</title>
+  <meta name="author" content="Stefan Eletzhofer">
+
+  
+  <meta name="description" content="In this post I&#8217;ll explore how groovy may be used to script Windchill PDMlink. Setting up the classpath To have acces sto the PDMlink libraries &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://seletz.github.com/blog/2012/01/08/groovy-scripting-pdmlink">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-28179328-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">My Octopress Blog</a></h1>
+  
+    <h2>my personal blog</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:seletz.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Groovy: Scripting PDMlink</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-01-08T20:33:00+01:00" pubdate data-updated="true">2012-01-08</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>In this post I&#8217;ll explore how <code>groovy</code> may be used to script <code>Windchill PDMlink</code>.</p>
+
+<!-- more -->
+
+
+<h2>Setting up the classpath</h2>
+
+<p>To have acces sto the <code>PDMlink</code> libraries, I&#8217;ll add a locally mounted <code>codebase</code>
+directory to the <code>$CLASSPATH</code>:</p>
+
+<pre><code>$ echo $WT_HOME
+/Volumes/settr-vm-ptc/Windchill
+$ wtclasspath
+export CLASSPATH=:/Volumes/settr-vm-ptc/Windchill/codebas...
+$ $(wtclasspath)
+</code></pre>
+
+<p>The <code>wtclasspath</code>script looks like this:</p>
+
+<figure class='code'><figcaption><span>wtclasspath (wtclasspath)</span> <a href='/downloads/code/shell/wtclasspath'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">function </span>setup_classpath<span class="o">()</span>
+</span><span class='line'><span class="o">{</span>
+</span><span class='line'>  <span class="k">for </span>jar in <span class="k">$(</span>find <span class="nv">$WT_HOME</span>/codebase/WEB-INF -name <span class="s2">&quot;*.jar&quot;</span><span class="k">)</span>; <span class="k">do</span>
+</span><span class='line'><span class="k">      </span><span class="nv">cp</span><span class="o">=</span><span class="nv">$cp</span>:<span class="nv">$jar</span>
+</span><span class='line'>  <span class="k">done</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>setup_classpath
+</span><span class='line'>
+</span><span class='line'><span class="nb">echo</span> <span class="s2">&quot;export CLASSPATH=$cp:$WT_HOME/codebase&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Logging In</h2>
+
+<p>To log in, we need to fetch the <code>RemoteMethodServer</code> and set username and password:</p>
+
+<figure class='code'><figcaption><span>logging in (wt_login.groovy)</span> <a href='/downloads/code/groovy/wt_login.groovy'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">wt.method.RemoteMethodServer</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">ms</span> <span class="o">=</span> <span class="n">RemoteMethodServer</span><span class="o">.</span><span class="na">getDefault</span><span class="o">()</span>
+</span><span class='line'><span class="n">ms</span><span class="o">.</span><span class="na">setUserName</span><span class="o">(</span><span class="s">&quot;orgadmin&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="n">ms</span><span class="o">.</span><span class="na">setPassword</span><span class="o">(</span><span class="s">&quot;orgadmin&quot;</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After this, we&#8217;re able to use the <strong>windchill API</strong>.</p>
+
+<h2>Fetching PDMlink Business Objects by Reference</h2>
+
+<p>Fetching a business object using it&#8217;s <em>Object Reference String</em> translates
+also quite well to groovy:</p>
+
+<figure class='code'><figcaption><span>fetch a object (wt_docinfo.groovy)</span> <a href='/downloads/code/groovy/wt_docinfo.groovy'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">wt.method.RemoteMethodServer</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">com.ptc.wvs.server.util.PublishUtils</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="n">def</span> <span class="nf">login</span><span class="o">(</span><span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">ms</span> <span class="o">=</span> <span class="n">RemoteMethodServer</span><span class="o">.</span><span class="na">getDefault</span><span class="o">()</span>
+</span><span class='line'>    <span class="n">ms</span><span class="o">.</span><span class="na">setUserName</span><span class="o">(</span><span class="n">args</span><span class="o">.</span><span class="na">user</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">ms</span><span class="o">.</span><span class="na">setPassword</span><span class="o">(</span><span class="n">args</span><span class="o">.</span><span class="na">password</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="n">ms</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">def</span> <span class="n">getObjectFromOR</span> <span class="o">=</span> <span class="o">{</span> <span class="n">oid</span> <span class="o">-&gt;</span>
+</span><span class='line'>    <span class="n">PublishUtils</span><span class="o">.</span><span class="na">getObjectFromRef</span><span class="o">(</span><span class="n">oid</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">def</span> <span class="n">getORFromObject</span> <span class="o">=</span> <span class="o">{</span> <span class="n">obj</span> <span class="o">-&gt;</span>
+</span><span class='line'>    <span class="n">PublishUtils</span><span class="o">.</span><span class="na">getRefFromObject</span><span class="o">(</span><span class="n">obj</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// log in</span>
+</span><span class='line'><span class="n">login</span><span class="o">(</span><span class="nl">user:</span> <span class="s">&quot;orgadmin&quot;</span><span class="o">,</span> <span class="nl">password:</span> <span class="s">&quot;orgadmin&quot;</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// fetch a object by using a OR</span>
+</span><span class='line'><span class="n">def</span> <span class="n">oid</span> <span class="o">=</span> <span class="s">&quot;VR:wt.epm.EPMDocument:8483330&quot;</span>
+</span><span class='line'><span class="n">def</span> <span class="n">doc</span> <span class="o">=</span> <span class="n">getObjectFromOR</span><span class="o">(</span><span class="n">oid</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// We&#39;re able to access the properties of the EPMDocument</span>
+</span><span class='line'><span class="n">println</span> <span class="s">&quot;${doc.displayIdentifier} [${doc.state} ${doc.type}] ${getORFromObject(doc)}&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// for the &quot;inspact last&quot; feature of groovyConsole </span>
+</span><span class='line'><span class="k">return</span> <span class="n">doc</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Running this script is easy:</p>
+
+<pre><code>$ groovy -cp $CLASSPATH wt_docinfo.groovy
+k06__core-coil_cc0000000.asm, -.17 [RELEASED CAD-Dokument] OR:wt.epm.EPMDocument:112511174
+</code></pre>
+
+<p>But this is all quite basic, and not using the <strong>groovy</strong> language features very much at all.</p>
+
+<h2>Fetching all iterations of an object</h2>
+
+<p>Now we&#8217;re going to use the <code>VersionControlHelper</code> service to fetch all iterations of an
+object and print some information.  Please note how <strong>groovy</strong> makes it easy to traverse
+collections using <code>each</code> and a <em>closure</em>.  Also note the <code>import ... as ...</code>:</p>
+
+<figure class='code'><figcaption><span>printing iteration history (wt_iterations.groovy)</span> <a href='/downloads/code/groovy/wt_iterations.groovy'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">wt.method.RemoteMethodServer</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">com.ptc.wvs.server.util.PublishUtils</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">wt.vc.VersionControlHelper</span> <span class="n">as</span> <span class="n">VCH</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">def</span> <span class="nf">login</span><span class="o">(</span><span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">ms</span> <span class="o">=</span> <span class="n">RemoteMethodServer</span><span class="o">.</span><span class="na">getDefault</span><span class="o">()</span>
+</span><span class='line'>    <span class="n">ms</span><span class="o">.</span><span class="na">setUserName</span><span class="o">(</span><span class="n">args</span><span class="o">.</span><span class="na">user</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">ms</span><span class="o">.</span><span class="na">setPassword</span><span class="o">(</span><span class="n">args</span><span class="o">.</span><span class="na">password</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="n">ms</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">def</span> <span class="nf">getObjectFromOR</span><span class="o">(</span><span class="n">oid</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">PublishUtils</span><span class="o">.</span><span class="na">getObjectFromRef</span><span class="o">(</span><span class="n">oid</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">def</span> <span class="nf">getORFromObject</span><span class="o">(</span><span class="n">obj</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">PublishUtils</span><span class="o">.</span><span class="na">getRefFromObject</span><span class="o">(</span><span class="n">obj</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">def</span> <span class="nf">info</span><span class="o">(</span><span class="n">doc</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="s">&quot;${doc.displayIdentifier} [${doc.state} ${doc.type}] ${getORFromObject(doc)}&quot;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// log in</span>
+</span><span class='line'><span class="n">login</span><span class="o">(</span><span class="nl">user:</span> <span class="s">&quot;orgadmin&quot;</span><span class="o">,</span> <span class="nl">password:</span> <span class="s">&quot;orgadmin&quot;</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// fetch a object by using a OR</span>
+</span><span class='line'><span class="n">def</span> <span class="n">oid</span> <span class="o">=</span> <span class="s">&quot;VR:wt.epm.EPMDocument:8483330&quot;</span>
+</span><span class='line'><span class="n">def</span> <span class="n">doc</span> <span class="o">=</span> <span class="n">getObjectFromOR</span><span class="o">(</span><span class="n">oid</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">VCH</span><span class="o">.</span><span class="na">service</span><span class="o">.</span><span class="na">allIterationsOf</span><span class="o">(</span><span class="n">doc</span><span class="o">.</span><span class="na">master</span><span class="o">).</span><span class="na">each</span> <span class="o">{</span> <span class="n">obj</span> <span class="o">-&gt;</span>
+</span><span class='line'>    <span class="n">println</span> <span class="nf">info</span><span class="o">(</span><span class="n">obj</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The output:</p>
+
+<pre><code>$ groovy -cp $CLASSPATH wt_iterations.groovy
+k06__core-coil_cc0000000.asm, -.17 [RELEASED CAD-Dokument] OR:wt.epm.EPMDocument:112511174
+k06__core-coil_cc0000000.asm, -.16 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:105876837
+k06__core-coil_cc0000000.asm, -.15 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:95189959
+k06__core-coil_cc0000000.asm, -.14 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:86656605
+k06__core-coil_cc0000000.asm, -.13 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:67720806
+k06__core-coil_cc0000000.asm, -.12 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:57847775
+k06__core-coil_cc0000000.asm, -.11 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:46825566
+k06__core-coil_cc0000000.asm, -.10 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:44606524
+k06__core-coil_cc0000000.asm, -.9 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:39832260
+k06__core-coil_cc0000000.asm, -.8 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:31441018
+k06__core-coil_cc0000000.asm, -.7 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:31417993
+k06__core-coil_cc0000000.asm, -.6 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:30833875
+k06__core-coil_cc0000000.asm, -.5 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:28909290
+k06__core-coil_cc0000000.asm, -.4 [INWORK CAD-Dokument] OR:wt.epm.EPMDocument:11014342
+</code></pre>
+
+<p>Cool, eh?  The code <em>almost</em> looks like <strong>coffee script</strong> to me!</p>
+
+<h2>Using the GroovyConsole and the Object Browser</h2>
+
+<p>I&#8217;m no big fan of using heavy UIs when programming &#8211; I&#8217;m a avid user of <em>MacVIM</em> after all &#8211; but
+being able to <em>explore</em> live-objects sounded at least interesting to me.</p>
+
+<p>So, I fired up the <code>groovyConsole</code>:</p>
+
+<pre><code>$ groovyConsole -cp $CLASSPATH wt_docinfo.groovy 
+</code></pre>
+
+<p><img class="center" src="http://dl.dropbox.com/u/154097/blog-images/groovy-object-browser.jpg" title="browsing a EPMDocument" alt="groovy object browser"></p>
+
+<h2>Conclusion</h2>
+
+<p>The experiments so far have been promising.  What I want to explore further is:</p>
+
+<ul>
+<li>runtime performance compared to <strong>jython</strong></li>
+<li>importing <strong>groovy</strong> classes in java (should be a no-brainer)</li>
+<li>creating a servlet using <strong>groovy</strong>, using <code>Groovy Server Pages</code></li>
+<li>all of the above together in the <strong>Windchill</strong> context</li>
+<li>doing a side-by-side comparsion of <strong>jython</strong> and <strong>groovy</strong> code</li>
+</ul>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Stefan Eletzhofer</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-01-08T20:33:00+01:00" pubdate data-updated="true">2012-01-08</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://seletz.github.com/blog/2012/01/08/groovy-scripting-pdmlink/" data-via="seletz" data-counturl="http://seletz.github.com/blog/2012/01/08/groovy-scripting-pdmlink/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/01/06/switch-from-bash-to-zsh/" title="Previous Post: switch from bash to zsh">&laquo; switch from bash to zsh</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/01/08/groovy-scripting-pdmlink/">groovy: scripting PDMlink</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/01/06/switch-from-bash-to-zsh/">switch from bash to zsh</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/01/05/experiments-with-groovy/">experiments with groovy</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Github Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/seletz">@seletz</a> on Github
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'seletz',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("seletz", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/seletz" class="twitter-follow-button" data-show-count="false">Follow @seletz</a>
+  
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - Stefan Eletzhofer -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'seletz';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://seletz.github.com/blog/2012/01/08/groovy-scripting-pdmlink/';
+        var disqus_url = 'http://seletz.github.com/blog/2012/01/08/groovy-scripting-pdmlink/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
