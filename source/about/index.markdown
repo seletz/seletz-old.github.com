@@ -1,8 +1,7 @@
 ---
 layout: page
 title: about
-date: 2012-01-13 16:09
-comments: true
+comments: no
 sharing: true
 footer: true
 ---
@@ -26,12 +25,16 @@ I've been programming computers basically my whole life -- I've started on a
 [VIC 20] [2], moved to a [C64] [3], an [Amiga 500] [4], an [Amiga 2000] [5],
 then to PCs.
 
+{% pullquote %}
 Quickly after I started to study *applied computer science* I started to use
 Linux.  I did a my diploma thesis at a company near Frankfurt, Germany.  They
 created software which processed bank transaction data.  This software was run
 on very big UNIX machines.  I was introduced to the `vi` editor (**not** the
 *vim*) and terminals.  I've never been able to use a non-modal editor
-efficiently.
+efficiently {"disclaimer: I can't type."}.
+{% endpullquote %}
+
+----
 
 My first job as professional software developer involved creating add-ons for a
 [3D CAD] [7] system, which we coded in [C] [6].  These add-ons had to run on
@@ -39,17 +42,23 @@ all platforms the cad software was available back then: [Solaris] [8], [HP UX]
 [9], [AIX] [10], [Linux] [11], [SGI/Irix] [12] and [Windows/NT] [13].  We had
 **one** code base -- enough said.
 
+----
+
+{% pullquote %}
 Afterwards I got involved in Linux kernel development on the [ARM] [14]
 architecture -- first using the [StrongARM] [15] SOC, then moving to the
 [XScale] [16].  I did the whole stuff, board bring-up, hardware debugging using
-a logic analyzer (involving lots of shouting, cursing, head banging), creating
+a logic analyzer ), creating
 a board support page, maintaining kernel deployments, creating custom drivers
 for a custom high-speed measurement hardware, creating "userland" development
-libraries for them.
+libraries for them. {" This involved lots of shouting, cursing, head banging."}
 created hard real-time drivers and software using [xenomai] [18], and I ported a
 soft-SPS software to this platform.  I also helped to port over code which was written
 for a older architecture with a fixed, static memory layout to this platform
 (horrors!).  This was a very fun time, indeed.
+{% endpullquote %}
+
+----
 
 In the mean time, I was a co-founder of [InQuant] [19], which I and all but
 one of the founders left again afterwards to found [nexiles] [1].
@@ -62,11 +71,13 @@ of artist pages over at Warner Music, Germany.  This was also the time when I go
 introduced and fond of Test Driven Development.
 Afterwards I got involved in Linux kernel development on the [ARM] [14]
 
+----
+
 {% pullquote %}
 Nowadays I still develop using those fancy *higher* languages, and I got into
 [coffeescript] [23] and we're doing UI development using [backbone.js] [24] in
 the *enterprise* world.
-{" enterprise mostly means obsolete browsers, obsolete mindsets, obsolete operanting systems and obsolete web stacks "}
+{" Note: enterprise mostly means obsolete browsers, obsolete mindsets, obsolete operating systems and obsolete web stacks "}
 
 I've come to a full circle now -- I'm doing back-end add-ons for a [PLM System] [25]
 which is used to manage CAD data created by the CAD system.  But I've not forgot
