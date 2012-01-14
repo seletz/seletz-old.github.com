@@ -9,7 +9,7 @@ footer: true
 
 {% img right /images/seletz.jpg 'that's me 'a picture of me'%}
 
-This iy my **personal** blog -- I'll try to do regular posts which revolve around
+This is my **personal** blog -- I'll try to do regular posts which revolve around
 the stuff I'm interested in.
 
 
@@ -18,8 +18,8 @@ the stuff I'm interested in.
 
 {% pullquote %}
 I'm a professional software developer.  I'm the founder of [nexiles] [1],
-a software development and cosulting software.
-{"TL;DR: I'm a jack of all trades, joureyman of some.  "}
+a software development and consulting software.
+{"TL;DR: I'm a jack of all trades, journeyman of some.  "}
 {% endpullquote %}
 
 I've been programming computers basically my whole life -- I've started on a
@@ -37,17 +37,17 @@ My first job as professional software developer involved creating add-ons for a
 [3D CAD] [7] system, which we coded in [C] [6].  These add-ons had to run on
 all platforms the cad software was available back then: [Solaris] [8], [HP UX]
 [9], [AIX] [10], [Linux] [11], [SGI/Irix] [12] and [Windows/NT] [13].  We had
-**one** codebase -- enough said.
+**one** code base -- enough said.
 
-Afterwards I got involved in linux kernel development on the [ARM] [14]
+Afterwards I got involved in Linux kernel development on the [ARM] [14]
 architecture -- first using the [StrongARM] [15] SOC, then moving to the
-[XScale] [16].  I did the whole stuff, board bringup, hardware debugging using
-a logic analyzer (involving lots of shouting, cursing, headbanging), creating a
-board support page, maintaining kernel deployments, creating custom drivers for
-a custom high-speed measurement hardware, creating userland development libraries
-for them.
-created hard realtime drivers and software using [xenomai] [18], and I ported a
-soft-sps software to this platform.  I also helped to port over code which was written
+[XScale] [16].  I did the whole stuff, board bring-up, hardware debugging using
+a logic analyzer (involving lots of shouting, cursing, head banging), creating
+a board support page, maintaining kernel deployments, creating custom drivers
+for a custom high-speed measurement hardware, creating "userland" development
+libraries for them.
+created hard real-time drivers and software using [xenomai] [18], and I ported a
+soft-SPS software to this platform.  I also helped to port over code which was written
 for a older architecture with a fixed, static memory layout to this platform
 (horrors!).  This was a very fun time, indeed.
 
@@ -57,18 +57,18 @@ one of the founders left again afterwards to found [nexiles] [1].
 During the time at *InQuant* -- sic, fancy spelling -- I've switched to
 do full-time web development revolving around the [Zope] [20] and [Plone] [21]
 systems.  This was when I got fond of [Python] [22].  Amongst other things,
-back then we're hosted and developed the backend which drove the whole bunch
+back then we're hosted and developed the back end which drove the whole bunch
 of artist pages over at Warner Music, Germany.  This was also the time when I got
 introduced and fond of Test Driven Development.
-Afterwards I got involved in linux kernel development on the [ARM] [14]
+Afterwards I got involved in Linux kernel development on the [ARM] [14]
 
 {% pullquote %}
-Nowadays I still develop using those fancy *higher* languagues, and I got into
+Nowadays I still develop using those fancy *higher* languages, and I got into
 [coffeescript] [23] and we're doing UI development using [backbone.js] [24] in
 the *enterprise* world.
 {" enterprise mostly means obsolete browsers, obsolete mindsets, obsolete operanting systems and obsolete web stacks "}
 
-I've come to a full circle now -- I'm doing backend add-ons for a [PLM System] [25]
+I've come to a full circle now -- I'm doing back-end add-ons for a [PLM System] [25]
 which is used to manage CAD data created by the CAD system.  But I've not forgot
 where I come from -- I'm using [Jython] [26] to overcome some of the Java/Tomcat/Apache/Oracle
 madness, and I'm developing my own, sane, lean JSON web API for the thing.
@@ -100,3 +100,4 @@ madness, and I'm developing my own, sane, lean JSON web API for the thing.
 [23]: http://coffeescript.org					"coffescript"
 [24]: http://http://documentcloud.github.com/backbone		"backbone"
 [25]: http://www.ptc.com/product/windchill/pdmlink		"PLM System"
+[26]: http://www.jython.org                       	 	"Jython"
