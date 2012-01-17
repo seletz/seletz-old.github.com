@@ -29,10 +29,13 @@ use to install [veewee] [1] with :
 $ rvm use 1.9.2
 $ rvm gemset create veewee
 $ rvm 1.9.2@veewee
-$ rvm install veewee
+$ gem install veewee
 $ which vagrant
 /Users/seletz/.rvm/gems/ruby-1.9.2-p290@veewee192/bin/vagrant
 {% endcodeblock %}
+
+**EDIT: the first version of this post had an error in the above
+statements.  Thanks, oliver!**
 
 So, whenever I want to use [vagrant] [2] with the [veewee] [1] extension, I need to
 do a:
