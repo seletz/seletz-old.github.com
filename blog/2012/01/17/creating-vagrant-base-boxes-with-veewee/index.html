@@ -1,25 +1,114 @@
-<?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: tools | My Octopress Blog]]></title>
-  <link href="http://seletz.github.com/blog/categories/tools/atom.xml" rel="self"/>
-  <link href="http://seletz.github.com/"/>
-  <updated>2012-01-17T08:47:06+01:00</updated>
-  <id>http://seletz.github.com/</id>
-  <author>
-    <name><![CDATA[Stefan Eletzhofer]]></name>
-    
-  </author>
-  <generator uri="http://octopress.org/">Octopress</generator>
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Creating Vagrant Base Boxes With veewee - My Octopress Blog</title>
+  <meta name="author" content="Stefan Eletzhofer">
 
   
-  <entry>
-    <title type="html"><![CDATA[Creating Vagrant Base Boxes With veewee]]></title>
-    <link href="http://seletz.github.com/blog/2012/01/17/creating-vagrant-base-boxes-with-veewee/"/>
-    <updated>2012-01-17T08:26:00+01:00</updated>
-    <id>http://seletz.github.com/blog/2012/01/17/creating-vagrant-base-boxes-with-veewee</id>
-    <content type="html"><![CDATA[<p>In this post I show how to install and use <a href="https://github.com/jedi4ever/veewee" title="veewee">veewee</a> to create a new
-base box for <a href="https://www.vagrantup.com" title="vagrant">vagrant</a>.  Then I'll show how to use this new base box to
+  <meta name="description" content="In this post I show how to install and use veewee to create a new
+base box for vagrant. Then I&#8217;ll show how to use this new base box to
+create a &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://seletz.github.com/blog/2012/01/17/creating-vagrant-base-boxes-with-veewee">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-28179328-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">My Octopress Blog</a></h1>
+  
+    <h2>my personal blog</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:seletz.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Creating Vagrant Base Boxes With Veewee</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-01-17T08:26:00+01:00" pubdate data-updated="true">2012-01-17</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>In this post I show how to install and use <a href="https://github.com/jedi4ever/veewee" title="veewee">veewee</a> to create a new
+base box for <a href="https://www.vagrantup.com" title="vagrant">vagrant</a>.  Then I&#8217;ll show how to use this new base box to
 create a <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> setup.</p>
 
 <!-- more -->
@@ -29,16 +118,16 @@ create a <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> setup.<
 
 <h2>Installing to a ruby rvm gemset</h2>
 
-<p>Disclaimer: I'm <strong>completely</strong> new to <code>rvm</code> and all.  So please bear with
+<p>Disclaimer: I&#8217;m <strong>completely</strong> new to <code>rvm</code> and all.  So please bear with
 me.</p>
 
-<p>I've used the <a href="https://rvm.beginrescueend.com/" title="rvm documentation">rvm documentation</a> to get this going (btw, awesome domain name).</p>
+<p>I&#8217;ve used the <a href="https://rvm.beginrescueend.com/" title="rvm documentation">rvm documentation</a> to get this going (btw, awesome domain name).</p>
 
-<p>So it seems that <code>rvm</code> is some kind of ruby's <code>virtualenv</code>.  Let's setup a
-new environment using ruby 1.9.2, and then create a <code>gemset</code> which we'll
+<p>So it seems that <code>rvm</code> is some kind of ruby&#8217;s <code>virtualenv</code>.  Let&#8217;s setup a
+new environment using ruby 1.9.2, and then create a <code>gemset</code> which we&#8217;ll
 use to install <a href="https://github.com/jedi4ever/veewee" title="veewee">veewee</a> with :</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -50,24 +139,26 @@ use to install <a href="https://github.com/jedi4ever/veewee" title="veewee">veew
 </span><span class='line'><span class="nv">$ </span>rvm install veewee
 </span><span class='line'><span class="nv">$ </span>which vagrant
 </span><span class='line'>/Users/seletz/.rvm/gems/ruby-1.9.2-p290@veewee192/bin/vagrant
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure>
+
 
 <p>So, whenever I want to use <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> with the <a href="https://github.com/jedi4ever/veewee" title="veewee">veewee</a> extension, I need to
 do a:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>rvm 1.9.2@veewee
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure>
+
 
 <p>OK, fine.</p>
 
 <h2>Testing</h2>
 
 <p><a href="https://github.com/jedi4ever/veewee" title="veewee">veewee</a> promises that it can build <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> base boxes from <em>scratch</em>
-using templates.  Let's test this and select a <em>ubuntu 11.04 64 bit
-"natty"</em> template:</p>
+using templates.  Let&#8217;s test this and select a <em>ubuntu 11.04 64 bit
+&#8220;natty&#8221;</em> template:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -77,45 +168,43 @@ using templates.  Let's test this and select a <em>ubuntu 11.04 64 bit
 <span class='line-number'>8</span>
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>vagrant basebox define <span class="s1">&#39;myubuntubox&#39;</span> <span class="s1">&#39;ubuntu-11.04-server-amd64&#39;</span>
 </span><span class='line'><span class="nv">$ </span>tree
 </span><span class='line'>.
-</span><span class='line'>└── definitions&lt;/p&gt;
+</span><span class='line'>└── definitions
+</span><span class='line'>    └── myubuntubox
+</span><span class='line'>        ├── definition.rb
+</span><span class='line'>        ├── postinstall.sh
+</span><span class='line'>        └── preseed.cfg
 </span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;└── myubuntubox
-</span><span class='line'>    ├── definition.rb
-</span><span class='line'>    ├── postinstall.sh
-</span><span class='line'>    └── preseed.cfg
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;2 directories, 3 files
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span><span class='line'>2 directories, 3 files
+</span></code></pre></td></tr></table></div></figure>
+
 
 <p><a href="https://github.com/jedi4ever/veewee" title="veewee">veewee</a> created a directory <code>definitions</code> for us, which is basically a
 copy of the template we selected.  We <em>could</em> change the definitions, but
-we'll do that later -- I'll just want to see if the basic process works.</p>
+we&#8217;ll do that later &#8211; I&#8217;ll just want to see if the basic process works.</p>
 
-<p>Now let's actually <em>build</em> the VM image which will eventually become our
-new <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> base box.  We did not change the definitions, and we did'nt
+<p>Now let&#8217;s actually <em>build</em> the VM image which will eventually become our
+new <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> base box.  We did not change the definitions, and we did&#8217;nt
 specify a <em>ISO</em> image, and thus <a href="https://github.com/jedi4ever/veewee" title="veewee">veewee</a> will download it to a <code>iso</code>
 directory for us:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>vagrant build <span class="s1">&#39;myubuntubox&#39;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>It's quite spectacular -- the image will be booted and <a href="https://github.com/jedi4ever/veewee" title="veewee">veewee</a> will use
-VBoxManage to send keystrokes to the VM -- defining initial boot parameters
+
+<p>It&#8217;s quite spectacular &#8211; the image will be booted and <a href="https://github.com/jedi4ever/veewee" title="veewee">veewee</a> will use
+VBoxManage to send keystrokes to the VM &#8211; defining initial boot parameters
 etc.  The net result is, that <code>veewe</code> will do a complete <em>headless</em>
-install of the specified template (a ubuntu "natty" 64 bit server image in
+install of the specified template (a ubuntu &#8220;natty&#8221; 64 bit server image in
 this test) and install all the dependencies needed for the image to act as
 a <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> box.</p>
 
-<p>Let's verify the created image using the <code>verify</code> command:</p>
+<p>Let&#8217;s verify the created image using the <code>verify</code> command:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -126,21 +215,22 @@ a <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> box.</p>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>vagrant basebox validate <span class="s1">&#39;myubuntubox&#39;</span>
 </span><span class='line'>...
 </span><span class='line'>Failing Scenarios:
-</span><span class='line'>cucumber /Users/seletz/.rvm/gems/ruby-1.9.2-p290@veewee192/gems/veewee-0.2.2/lib/veewee/../../validation/vagrant.feature:33 <span class="c"># Scenario: Checking chef&lt;/p&gt;</span>
+</span><span class='line'>cucumber /Users/seletz/.rvm/gems/ruby-1.9.2-p290@veewee192/gems/veewee-0.2.2/lib/veewee/../../validation/vagrant.feature:33 <span class="c"># Scenario: Checking chef</span>
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;7 scenarios <span class="o">(</span>1 failed, 6 passed<span class="o">)</span>
+</span><span class='line'>7 scenarios <span class="o">(</span>1 failed, 6 passed<span class="o">)</span>
 </span><span class='line'>21 steps <span class="o">(</span>1 failed, 20 passed<span class="o">)</span>
 </span><span class='line'>0m2.462s
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>Cool -- they use ruby specs to actually test the image.  I've got one
-failing spec regarding <code>chef</code> -- I don't plan to se <code>chef</code> for now,
-so I'll ignore this.</p>
 
-<p>Up until now, all we have is a VirtualBox VM.  Now let's export the VM
+<p>Cool &#8211; they use ruby specs to actually test the image.  I&#8217;ve got one
+failing spec regarding <code>chef</code> &#8211; I don&#8217;t plan to se <code>chef</code> for now,
+so I&#8217;ll ignore this.</p>
+
+<p>Up until now, all we have is a VirtualBox VM.  Now let&#8217;s export the VM
 to an actual <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> box file:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -165,20 +255,21 @@ to an actual <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> box
 </span><span class='line'>...
 </span><span class='line'>Machine myubuntubox is powered off cleanly
 </span><span class='line'>Executing vagrant voodoo:
-</span><span class='line'>vagrant package --base <span class="s1">&#39;myubuntubox&#39;</span> --output <span class="s1">&#39;myubuntubox.box&#39;</span>&lt;/p&gt;
+</span><span class='line'>vagrant package --base <span class="s1">&#39;myubuntubox&#39;</span> --output <span class="s1">&#39;myubuntubox.box&#39;</span>
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;To import it into vagrant <span class="nb">type</span>:
-</span><span class='line'>vagrant box add <span class="s1">&#39;myubuntubox&#39;</span> <span class="s1">&#39;myubuntubox.box&#39;</span>&lt;/p&gt;
+</span><span class='line'>To import it into vagrant <span class="nb">type</span>:
+</span><span class='line'>vagrant box add <span class="s1">&#39;myubuntubox&#39;</span> <span class="s1">&#39;myubuntubox.box&#39;</span>
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;To use it:
+</span><span class='line'>To use it:
 </span><span class='line'>vagrant init <span class="s1">&#39;myubuntubox&#39;</span>
 </span><span class='line'>vagrant up
 </span><span class='line'>vagrant ssh
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure>
+
 
 <p>Cool, it did create a box file:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -202,18 +293,19 @@ to an actual <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> box
 </span><span class='line'>-rw-------  0 501    20        121 16 Jan 20:20 box.mf
 </span><span class='line'>-rw-------  0 501    20      13271 16 Jan 20:19 box.ovf
 </span><span class='line'>-rw-r--r--  0 501    20        505 16 Jan 20:20 Vagrantfile
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure>
+
 
 <p>See? the box file is actually a tarball of the exported VM, the root disk
 and some meta data.</p>
 
-<p>But we <em>still</em> can't use that file.  We first need to <em>add</em> the box to our
+<p>But we <em>still</em> can&#8217;t use that file.  We first need to <em>add</em> the box to our
 vagrant setup.  We could upload that box file to a local HTTP server or
 something like that.  The <code>vagrant add</code> command takes a URL or a path.</p>
 
-<p>OK, let's add the box, so that we can use it to create <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> machines:</p>
+<p>OK, let&#8217;s add the box, so that we can use it to create <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> machines:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -242,8 +334,6 @@ something like that.  The <code>vagrant add</code> command takes a URL or a path
 <span class='line-number'>27</span>
 <span class='line-number'>28</span>
 <span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>vagrant box add <span class="s1">&#39;myubuntubox&#39;</span> <span class="s1">&#39;myubuntubox.box&#39;</span>
 </span><span class='line'><span class="o">[</span>vagrant<span class="o">]</span> Downloading with Vagrant::Downloaders::File...
 </span><span class='line'><span class="o">[</span>vagrant<span class="o">]</span> Copying box to temporary location...
@@ -269,19 +359,18 @@ something like that.  The <code>vagrant add</code> command takes a URL or a path
 </span><span class='line'>│       ├── <span class="o">[</span> 121<span class="o">]</span>  box.mf
 </span><span class='line'>│       └── <span class="o">[</span> 13K<span class="o">]</span>  box.ovf
 </span><span class='line'>├── <span class="o">[</span>  68<span class="o">]</span>  logs
-</span><span class='line'>└── <span class="o">[</span> 102<span class="o">]</span>  tmp&lt;/p&gt;
+</span><span class='line'>└── <span class="o">[</span> 102<span class="o">]</span>  tmp
+</span><span class='line'>    └── <span class="o">[</span>   0<span class="o">]</span>  vagrant.lock
 </span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;└── <span class="o">[</span>   0<span class="o">]</span>  vagrant.lock
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt; 979M used in 6 directories, 13 files
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span><span class='line'> 979M used in 6 directories, 13 files
+</span></code></pre></td></tr></table></div></figure>
+
 
 <p>OK, all that did was to untar the tarball to <code>~/.vagrant.d/boxes/myubuntubox</code>.</p>
 
-<p>Let's create a test vagrant setup in the <code>tst</code> directory:</p>
+<p>Let&#8217;s create a test vagrant setup in the <code>tst</code> directory:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -313,9 +402,10 @@ something like that.  The <code>vagrant add</code> command takes a URL or a path
 </span><span class='line'><span class="o">[</span>default<span class="o">]</span> VM booted and ready <span class="k">for </span>use!
 </span><span class='line'><span class="o">[</span>default<span class="o">]</span> Mounting shared folders...
 </span><span class='line'><span class="o">[</span>default<span class="o">]</span> -- v-root: /vagrant
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>Wohooo!  Look's like we're in business!</p>
+
+<p>Wohooo!  Look&#8217;s like we&#8217;re in business!</p>
 
 <p><a href="https://www.vagrantup.com" title="vagrant">vagrant</a> created a <em>new</em> VM based on the <em>myubuntubox</em>, fired it up,
 configured a host-only network device, and configured port-forwarding such
@@ -325,32 +415,27 @@ machine is completely isolated.  The VM is also started in <em>headless</em> mod
 <p>All the above is specified in a configuration file <code>Vagrantfile</code>, which the
 command <code>vagrant init</code> did create:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># -*- mode: ruby -*-</span>
+</span><span class='line'><span class="c1"># vi: set ft=ruby ts=2 sw=2 expandtab:</span>
 </span><span class='line'>
-</span><span class='line'><span class="sr">&lt;h1&gt;-&lt;em&gt;- mode: ruby -&lt;/em</span><span class="o">&gt;-&lt;</span><span class="sr">/h1&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;h1&gt;vi: set ft=ruby ts=2 sw=2 expandtab:&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="no">Vagrant</span><span class="o">::</span><span class="no">Config</span><span class="o">.</span><span class="n">run</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+</span><span class='line'><span class="no">Vagrant</span><span class="o">::</span><span class="no">Config</span><span class="o">.</span><span class="n">run</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
 </span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="s2">&quot;myubuntubox&quot;</span>
 </span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>OK, I lied -- the actuall file is quite a bit longer -- but I just removed
+
+<p>OK, I lied &#8211; the actuall file is quite a bit longer &#8211; but I just removed
 <em>comments</em>.</p>
 
-<p>Now let'ls login, shall we? :</p>
+<p>Now let&#8217;ls login, shall we? :</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -374,20 +459,14 @@ command <code>vagrant init</code> did create:</p>
 <span class='line-number'>22</span>
 <span class='line-number'>23</span>
 <span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>vagrant ssh
-</span><span class='line'>Welcome to Ubuntu 11.04 <span class="o">(</span>GNU/Linux 2.6.38-8-server x86_64<span class="o">)</span>&lt;/p&gt;
+</span><span class='line'>Welcome to Ubuntu 11.04 <span class="o">(</span>GNU/Linux 2.6.38-8-server x86_64<span class="o">)</span>
 </span><span class='line'>
-</span><span class='line'>&lt;ul&gt;
-</span><span class='line'>&lt;li&gt;Documentation:  http://www.ubuntu.com/server/doc
+</span><span class='line'> * Documentation:  http://www.ubuntu.com/server/doc
 </span><span class='line'>New release <span class="s1">&#39;oneiric&#39;</span> available.
-</span><span class='line'>Run <span class="s1">&#39;do-release-upgrade&#39;</span> to upgrade to it.&lt;/li&gt;
-</span><span class='line'>&lt;/ul&gt;
+</span><span class='line'>Run <span class="s1">&#39;do-release-upgrade&#39;</span> to upgrade to it.
 </span><span class='line'>
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;Last login: Mon Jan 16 19:01:18 2012 from 10.0.2.2
+</span><span class='line'>Last login: Mon Jan 16 19:01:18 2012 from 10.0.2.2
 </span><span class='line'>vagrant@myubuntubox:~<span class="nv">$ </span>sudo id
 </span><span class='line'><span class="nv">uid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">groups</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span>
 </span><span class='line'>vagrant@myubuntubox:~<span class="nv">$ </span>mount
@@ -404,29 +483,30 @@ command <code>vagrant init</code> did create:</p>
 </span><span class='line'>none on /var/lock <span class="nb">type </span>tmpfs <span class="o">(</span>rw,noexec,nosuid,nodev<span class="o">)</span>
 </span><span class='line'>/dev/sda1 on /boot <span class="nb">type </span>ext2 <span class="o">(</span>rw<span class="o">)</span>
 </span><span class='line'>v-root on /vagrant <span class="nb">type </span>vboxsf <span class="o">(</span><span class="nv">uid</span><span class="o">=</span>1000,gid<span class="o">=</span>1000,rw<span class="o">)</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure>
+
 
 <p>Wow.  Sweet.</p>
 
 <p>A quite few things are of interest here:</p>
 
 <ul>
-<li><p>we're able to ssh in w/o specifying a password.  <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> uses
+<li><p>we&#8217;re able to ssh in w/o specifying a password.  <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> uses
 public key authentication, and per default uses an private key which
 lies inside the <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> gem.</p></li>
-<li><p>we're able to do a <code>sudo</code> w/o specifying a password.</p></li>
-<li><p>There's a <code>/vagrant</code> directory mounted.</p></li>
+<li><p>we&#8217;re able to do a <code>sudo</code> w/o specifying a password.</p></li>
+<li><p>There&#8217;s a <code>/vagrant</code> directory mounted.</p></li>
 </ul>
 
 
 <p>The <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> mount point is actually a VirtualBox shared folder, and is
 connected to our local <code>tst</code> folder, the one which contains the generated
-<code>Vagrantfile</code>!  This will come in quite handy later when we're start to
+<code>Vagrantfile</code>!  This will come in quite handy later when we&#8217;re start to
 provision things.</p>
 
 <p>Now lets look at resuming starting, stopping and so on:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -470,9 +550,10 @@ provision things.</p>
 </span><span class='line'><span class="o">[</span>default<span class="o">]</span> VM booted and ready <span class="k">for </span>use!
 </span><span class='line'><span class="o">[</span>default<span class="o">]</span> Mounting shared folders...
 </span><span class='line'><span class="o">[</span>default<span class="o">]</span> -- v-root: /vagrant
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>OK, let's recap.</p>
+
+<p>OK, let&#8217;s recap.</p>
 
 <ul>
 <li><p>Using <a href="https://github.com/jedi4ever/veewee" title="veewee">veewee</a> one can create a <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> base box with very minimal
@@ -503,22 +584,23 @@ testing up and running</p></li>
 
 <h2>Mutli-VM setup</h2>
 
-<p>OK, now let's use the new base box and create a custom <code>Vagrantfile</code> which
-specifies <em>two</em> VMs.  We'll have to name them differently, we'll use
-<code>rabbitmq</code> and <code>worker</code> (that's what I want to have in the end: a machine
+<p>OK, now let&#8217;s use the new base box and create a custom <code>Vagrantfile</code> which
+specifies <em>two</em> VMs.  We&#8217;ll have to name them differently, we&#8217;ll use
+<code>rabbitmq</code> and <code>worker</code> (that&#8217;s what I want to have in the end: a machine
 for RabbitMQ and a machine for a custom worker which uses RabbitMQ).</p>
 
-<p>We'll create a new directory for this test:</p>
+<p>We&#8217;ll create a new directory for this test:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>mkdir multivm
 </span><span class='line'><span class="nv">$ </span><span class="nb">cd </span>multivm
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure>
+
 
 <p>The <code>Vagrantfile</code> is simple:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -532,47 +614,30 @@ for RabbitMQ and a machine for a custom worker which uses RabbitMQ).</p>
 <span class='line-number'>12</span>
 <span class='line-number'>13</span>
 <span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># -*- mode: ruby -*-</span>
+</span><span class='line'><span class="c1"># vi: set ft=ruby ts=2 sw=2 expandtab:</span>
 </span><span class='line'>
-</span><span class='line'><span class="sr">&lt;h1&gt;-&lt;em&gt;- mode: ruby -&lt;/em</span><span class="o">&gt;-&lt;</span><span class="sr">/h1&gt;</span>
+</span><span class='line'><span class="no">Vagrant</span><span class="o">::</span><span class="no">Config</span><span class="o">.</span><span class="n">run</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">define</span> <span class="ss">:rabbitmq</span> <span class="k">do</span> <span class="o">|</span><span class="n">rabbitmq</span><span class="o">|</span>
+</span><span class='line'>    <span class="n">rabbitmq</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="s2">&quot;myubuntubox&quot;</span>
+</span><span class='line'>    <span class="n">rabbitmq</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">network</span> <span class="s2">&quot;192.168.50.10&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
 </span><span class='line'>
-</span><span class='line'><span class="sr">&lt;h1&gt;vi: set ft=ruby ts=2 sw=2 expandtab:&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="no">Vagrant</span><span class="o">::</span><span class="no">Config</span><span class="o">.</span><span class="n">run</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
-</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">define</span> <span class="ss">:rabbitmq</span> <span class="k">do</span> <span class="o">|</span><span class="n">rabbitmq</span><span class="o">|&lt;</span><span class="sr">/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;rabbitmq.vm.box = &quot;myubuntubox&quot;</span>
-</span><span class='line'><span class="sr">rabbitmq.vm.network &quot;192.168.50.10&quot;</span>
-</span><span class='line'><span class="sr">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="sr">/pre&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;p&gt;  end&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">define</span> <span class="ss">:worker</span> <span class="k">do</span> <span class="o">|</span><span class="n">worker</span><span class="o">|&lt;</span><span class="sr">/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;worker.vm.box = &quot;myubuntubox&quot;</span>
-</span><span class='line'><span class="sr">worker.vm.network &quot;192.168.50.11&quot;</span>
-</span><span class='line'><span class="sr">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="sr">/pre&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;p&gt;  end</span>
-</span><span class='line'><span class="sr">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">define</span> <span class="ss">:worker</span> <span class="k">do</span> <span class="o">|</span><span class="n">worker</span><span class="o">|</span>
+</span><span class='line'>    <span class="n">worker</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="s2">&quot;myubuntubox&quot;</span>
+</span><span class='line'>    <span class="n">worker</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">network</span> <span class="s2">&quot;192.168.50.11&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>We have configured two machines using the same 'myubuntubox' base box.  We
+
+<p>We have configured two machines using the same &#8216;myubuntubox&#8217; base box.  We
 also have configured a <strong>additional</strong> network device on both such that
-they're able to communicate with eachother.</p>
+they&#8217;re able to communicate with eachother.</p>
 
 <p>Fire it up:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -634,11 +699,12 @@ they're able to communicate with eachother.</p>
 </span><span class='line'><span class="o">[</span>worker<span class="o">]</span> Enabling host only network...
 </span><span class='line'><span class="o">[</span>worker<span class="o">]</span> Mounting shared folders...
 </span><span class='line'><span class="o">[</span>worker<span class="o">]</span> -- v-root: /vagrant
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure>
+
 
 <p>We can now ssh in to each machine:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -646,31 +712,33 @@ they're able to communicate with eachother.</p>
 </span><span class='line'>...
 </span><span class='line'><span class="nv">$ </span>vagrant ssh worker
 </span><span class='line'>...
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure>
+
 
 <p>OK, but what about installing some base packages after a <code>vagrant up</code>?
-Well, that's what <em>provisioning</em> is for.</p>
+Well, that&#8217;s what <em>provisioning</em> is for.</p>
 
 <h2>Provisioning</h2>
 
-<p>OK, let's use the <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> shell provisiooning to install <code>RabbitMQ</code>.  For
+<p>OK, let&#8217;s use the <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> shell provisiooning to install <code>RabbitMQ</code>.  For
 this, all we need to do is to create a shell script and place it next to
 the <code>Vagrantfile</code> and tell <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> about it.  When doing a <code>vagrant up</code>,
-the script will be executed and we're set.</p>
+the script will be executed and we&#8217;re set.</p>
 
 <p>This is the script:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>cat rabbitmq.sh
 </span><span class='line'>apt-get install -q -y rabbitmq-server
 </span><span class='line'>apt-get install -q -y iotop htop
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure>
+
 
 <p>And this is the only change to the <code>Vagrantfile</code> from the previous step:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -680,32 +748,23 @@ the script will be executed and we're set.</p>
 <span class='line-number'>8</span>
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
 </pre></td><td class='code'><pre><code class='diff'><span class='line'><span class="gh">diff --git a/Vagrantfile b/Vagrantfile</span>
 </span><span class='line'><span class="gh">index b0c5528..77ec500 100644</span>
 </span><span class='line'><span class="gd">--- a/Vagrantfile</span>
 </span><span class='line'><span class="gi">+++ b/Vagrantfile</span>
 </span><span class='line'><span class="gu">@@ -5,6 +5,7 @@ Vagrant::Config.run do |config|</span>
-</span><span class='line'>   config.vm.define :rabbitmq do |rabbitmq|&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt; rabbitmq.vm.box = &quot;myubuntubox&quot;
-</span><span class='line'> rabbitmq.vm.network &quot;192.168.50.10&quot;
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;ul&gt;
-</span><span class='line'>&lt;li&gt; rabbitmq.vm.provision :shell, :path =&gt; &quot;rabbitmq.sh&quot;
-</span><span class='line'>end
-</span></code></pre></td></tr></table></div></figure></notextile></div></li>
-</ul>
+</span><span class='line'>   config.vm.define :rabbitmq do |rabbitmq|
+</span><span class='line'>     rabbitmq.vm.box = &quot;myubuntubox&quot;
+</span><span class='line'>     rabbitmq.vm.network &quot;192.168.50.10&quot;
+</span><span class='line'><span class="gi">+    rabbitmq.vm.provision :shell, :path =&gt; &quot;rabbitmq.sh&quot;</span>
+</span><span class='line'>   end
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Now actually run the provisioning step.  Note that the VM is already
 running:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -733,9 +792,10 @@ running:</p>
 </span><span class='line'><span class="o">[</span>rabbitmq<span class="o">]</span> Setting up htop <span class="o">(</span>0.9-2<span class="o">)</span> ...
 </span><span class='line'><span class="o">[</span>rabbitmq<span class="o">]</span> Setting up iotop <span class="o">(</span>0.4-2<span class="o">)</span> ...
 </span><span class='line'><span class="o">[</span>rabbitmq<span class="o">]</span> Processing triggers <span class="k">for </span>python-support ...
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>That's really all there is to it!</p>
+
+<p>That&#8217;s really all there is to it!</p>
 
 <p>Recap:</p>
 
@@ -754,217 +814,216 @@ script to execute</p></li>
 <p>I think <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> is great.  And <a href="https://github.com/jedi4ever/veewee" title="veewee">veewee</a> allows for hassle-free base boxes
 to be set up, so no more downloading from untrusted sources!</p>
 
-<p>I'll definitely continue to integrate these systems in my task to get a
+<p>I&#8217;ll definitely continue to integrate these systems in my task to get a
 more complete test setup, including a headless CI setup with multiple
 machines.  Together with something like <code>phantom.js</code> we can even create
-screen shots in headless mode, such that we can peek at them errors ...</p>
-]]></content>
-  </entry>
+screen shots in headless mode, such that we can peek at them errors &#8230;</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
   
-  <entry>
-    <title type="html"><![CDATA[switch from bash to zsh]]></title>
-    <link href="http://seletz.github.com/blog/2012/01/06/switch-from-bash-to-zsh/"/>
-    <updated>2012-01-06T13:03:00+01:00</updated>
-    <id>http://seletz.github.com/blog/2012/01/06/switch-from-bash-to-zsh</id>
-    <content type="html"><![CDATA[<p>I finally came around to switch from <code>bash</code> to <code>zsh</code>.  While reading <a href="https://news.ycombinator.com" title="hackernews">hacker news</a>
-I found a nice little setup on <em>github</em>: <a href="https://github.com/robbyrussell/oh-my-zsh" title="oh-my-zsh">oh-my-zsh</a></p>
 
-<!-- more -->
+<span class="byline author vcard">Posted by <span class="fn">Stefan Eletzhofer</span></span>
+
+      
 
 
-<h2>Installation</h2>
 
-<p>Installation was quite easy:</p>
 
-<pre><code>$ brew install zsh
-$ cd $HOME
-$ git clone https://github.com/robbyrussell/oh-my-zsh.git .oh-my-zsh
-$ sudo chsh zsh
-</code></pre>
 
-<h2>Configuration</h2>
 
-<p>I did very little configuration.  All I really did is to choose a nice
-theme from the many available themes.  Anyhow, my <code>.zshrc</code> looks like this:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>.zshrc (zshrc)</span> <a href='/downloads/code/shell/zshrc'>download</a></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-<span class='line-number'>75</span>
-<span class='line-number'>76</span>
-<span class='line-number'>77</span>
-<span class='line-number'>78</span>
-<span class='line-number'>79</span>
-<span class='line-number'>80</span>
-<span class='line-number'>81</span>
-<span class='line-number'>82</span>
-<span class='line-number'>83</span>
-<span class='line-number'>84</span>
-<span class='line-number'>85</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># Path to your oh-my-zsh configuration.</span>
-</span><span class='line'><span class="nv">ZSH</span><span class="o">=</span><span class="nv">$HOME</span>/.oh-my-zsh
-</span><span class='line'>
-</span><span class='line'><span class="c"># Set name of the theme to load.</span>
-</span><span class='line'><span class="c"># Look in ~/.oh-my-zsh/themes/</span>
-</span><span class='line'><span class="c"># Optionally, if you set this to &quot;random&quot;, it&#39;ll load a random theme each</span>
-</span><span class='line'><span class="c"># time that oh-my-zsh is loaded.</span>
-</span><span class='line'><span class="nv">ZSH_THEME</span><span class="o">=</span><span class="s2">&quot;nanotech&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># Example aliases</span>
-</span><span class='line'><span class="c"># alias zshconfig=&quot;mate ~/.zshrc&quot;</span>
-</span><span class='line'><span class="c"># alias ohmyzsh=&quot;mate ~/.oh-my-zsh&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># Set to this to use case-sensitive completion</span>
-</span><span class='line'><span class="c"># CASE_SENSITIVE=&quot;true&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># Comment this out to disable weekly auto-update checks</span>
-</span><span class='line'><span class="c"># DISABLE_AUTO_UPDATE=&quot;true&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># Uncomment following line if you want to disable colors in ls</span>
-</span><span class='line'><span class="c"># DISABLE_LS_COLORS=&quot;true&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># Uncomment following line if you want to disable autosetting terminal title.</span>
-</span><span class='line'><span class="c"># DISABLE_AUTO_TITLE=&quot;true&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># Uncomment following line if you want red dots to be displayed while waiting for completion</span>
-</span><span class='line'><span class="c"># COMPLETION_WAITING_DOTS=&quot;true&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)</span>
-</span><span class='line'><span class="c"># Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/</span>
-</span><span class='line'><span class="c"># Example format: plugins=(rails git textmate ruby lighthouse)</span>
-</span><span class='line'><span class="nv">plugins</span><span class="o">=(</span>osx git git-flow fabric groovy grails python<span class="o">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">source</span> <span class="nv">$ZSH</span>/oh-my-zsh.sh
-</span><span class='line'>
-</span><span class='line'><span class="c"># Customize to your needs...</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">#---------------------------------------------------------------------</span>
-</span><span class='line'><span class="c"># prompt and path</span>
-</span><span class='line'><span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span>~/bin:/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:<span class="nv">$PATH</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">#---------------------------------------------------------------------</span>
-</span><span class='line'><span class="c"># env setup</span>
-</span><span class='line'><span class="nb">export </span><span class="nv">LANG</span><span class="o">=</span><span class="s2">&quot;de_DE.UTF-8&quot;</span>
-</span><span class='line'><span class="c"># gnuchlog vim plugin</span>
-</span><span class='line'><span class="nb">export </span><span class="nv">EMAIL</span><span class="o">=</span><span class="s2">&quot;Stefan Eletzhofer &lt;stefan.eletzhofer@nexiles.de&gt;&quot;</span>
-</span><span class='line'><span class="nb">export </span><span class="nv">EDITOR</span><span class="o">=</span><span class="s2">&quot;/Applications/MacVim.app/Contents/MacOS/Vim -g -f &quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">#---------------------------------------------------------------------</span>
-</span><span class='line'><span class="c"># python</span>
-</span><span class='line'><span class="nb">export </span><span class="nv">PYTHONSTARTUP</span><span class="o">=</span>~/.pyinit
-</span><span class='line'>
-</span><span class='line'><span class="nb">export </span><span class="nv">VIRTUALENVWRAPPER_PYTHON</span><span class="o">=</span>/usr/bin/python2.6
-</span><span class='line'><span class="nb">export </span><span class="nv">WORKON_HOME</span><span class="o">=</span>~/.virtualenvs
-</span><span class='line'><span class="nb">export </span><span class="nv">PROJECT_HOME</span><span class="o">=</span><span class="nv">$HOME</span>/develop
-</span><span class='line'><span class="nb">export </span><span class="nv">VIRTUALENV_ROOT</span><span class="o">=</span><span class="nv">$WORKON_HOME</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">export </span><span class="nv">JYTHON_HOME</span><span class="o">=</span><span class="k">$(</span>brew --prefix jython<span class="k">)</span>/libexec
-</span><span class='line'><span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:<span class="nv">$JYTHON_HOME</span>/bin
-</span><span class='line'>
-</span><span class='line'>. /usr/local/bin/virtualenvwrapper.sh
-</span><span class='line'>
-</span><span class='line'><span class="c">#---------------------------------------------------------------------</span>
-</span><span class='line'><span class="c"># NODE.JS</span>
-</span><span class='line'><span class="nb">export </span><span class="nv">NODE_PATH</span><span class="o">=</span>/usr/local/lib/node
-</span><span class='line'><span class="nb">export </span><span class="nv">JS_CMD</span><span class="o">=</span>node
-</span><span class='line'>
-</span><span class='line'><span class="c">#---------------------------------------------------------------------</span>
-</span><span class='line'><span class="c"># Ruby RVM</span>
-</span><span class='line'><span class="nb">source</span> ~/.rvm/scripts/rvm
-</span><span class='line'>
-</span><span class='line'><span class="c">#---------------------------------------------------------------------</span>
-</span><span class='line'><span class="c"># GROOVY</span>
-</span><span class='line'><span class="nb">export </span><span class="nv">GROOVY_HOME</span><span class="o">=</span><span class="k">$(</span>brew --prefix groovy<span class="k">)</span>/libexec
-</span><span class='line'>
-</span><span class='line'><span class="c">#---------------------------------------------------------------------</span>
-</span><span class='line'><span class="c"># alias</span>
-</span><span class='line'><span class="nb">alias </span><span class="nv">ls</span><span class="o">=</span><span class="s2">&quot;gls --color&quot;</span>
-</span><span class='line'><span class="nb">alias </span><span class="nv">la</span><span class="o">=</span><span class="s2">&quot;ls -la&quot;</span>
-</span><span class='line'><span class="nb">alias </span><span class="nv">ll</span><span class="o">=</span><span class="s2">&quot;ls -l&quot;</span>
-</span><span class='line'><span class="nb">alias </span><span class="nv">serve</span><span class="o">=</span><span class="s2">&quot;python -mSimpleHTTPServer&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">#---------------------------------------------------------------------</span>
-</span><span class='line'><span class="c"># direnv hook</span>
-</span><span class='line'><span class="nb">eval</span> <span class="sb">`</span>direnv hook <span class="nv">$0</span><span class="sb">`</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p>Here's how my terminal looks like now.  I'm using the <a href="http://ethanschoonover.com/solarized" title="solarized">solarized</a> colour scheme,
-and i'm using the <code>nanotech</code> theme:</p>
-
-<p><img class="center" src="http://dl.dropbox.com/u/154097/blog-images/zsh-theme.jpg" title="my zsh theme" alt="zsh terminal screenshot"></p>
-]]></content>
-  </entry>
   
-</feed>
+
+
+<time datetime="2012-01-17T08:26:00+01:00" pubdate data-updated="true">2012-01-17</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/testing/'>testing</a>, <a class='category' href='/blog/categories/tools/'>tools</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://seletz.github.com/blog/2012/01/17/creating-vagrant-base-boxes-with-veewee/" data-via="seletz" data-counturl="http://seletz.github.com/blog/2012/01/17/creating-vagrant-base-boxes-with-veewee/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/01/08/groovy-scripting-pdmlink/" title="Previous Post: groovy: scripting PDMlink">&laquo; groovy: scripting PDMlink</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/01/17/creating-vagrant-base-boxes-with-veewee/">Creating Vagrant Base Boxes With veewee</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/01/08/groovy-scripting-pdmlink/">groovy: scripting PDMlink</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/01/06/switch-from-bash-to-zsh/">switch from bash to zsh</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/01/05/experiments-with-groovy/">experiments with groovy</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("seletz", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/seletz" class="twitter-follow-button" data-show-count="false">Follow @seletz</a>
+  
+</section>
+
+
+<section>
+  <h1>Github Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/seletz">@seletz</a> on Github
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'seletz',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 &mdash; Stefan Eletzhofer &mdash;
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span> &mdash;
+  <span class="credit"><a href="/imprint">impressum</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'seletz';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://seletz.github.com/blog/2012/01/17/creating-vagrant-base-boxes-with-veewee/';
+        var disqus_url = 'http://seletz.github.com/blog/2012/01/17/creating-vagrant-base-boxes-with-veewee/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
