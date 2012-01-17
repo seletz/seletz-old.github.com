@@ -66,7 +66,7 @@ github_skip_forks: true
 # Twitter
 twitter_user: seletz
 twitter_tweet_count: 4
-twitter_show_replies: false
+twitter_show_replies: true
 twitter_follow_button: true
 twitter_show_follower_count: false
 twitter_tweet_button: true
@@ -77,7 +77,7 @@ google_plus_one_size: medium
 
 # Google Plus Profile
 # Hidden: No visible button, just add author information to search results
-googleplus_user:
+googleplus_user: 106477632016330375313
 googleplus_hidden: false
 
 # Pinboard
