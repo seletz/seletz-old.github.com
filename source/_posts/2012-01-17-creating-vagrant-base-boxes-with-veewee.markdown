@@ -76,7 +76,7 @@ specify a *ISO* image, and thus [veewee] [1] will download it to a `iso`
 directory for us:
 
 {% codeblock lang:bash %}
-$ vagrant build 'myubuntubox'
+$ vagrant basebox build 'myubuntubox'
 {% endcodeblock %}
 
 It's quite spectacular -- the image will be booted and [veewee] [1] will use
