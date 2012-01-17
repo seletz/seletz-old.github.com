@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://seletz.github.com/atom.xml" rel="self"/>
   <link href="http://seletz.github.com/"/>
-  <updated>2012-01-17T08:47:06+01:00</updated>
+  <updated>2012-01-17T14:31:42+01:00</updated>
   <id>http://seletz.github.com/</id>
   <author>
     <name><![CDATA[Stefan Eletzhofer]]></name>
@@ -47,11 +47,14 @@ use to install <a href="https://github.com/jedi4ever/veewee" title="veewee">veew
 </pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>rvm use 1.9.2
 </span><span class='line'><span class="nv">$ </span>rvm gemset create veewee
 </span><span class='line'><span class="nv">$ </span>rvm 1.9.2@veewee
-</span><span class='line'><span class="nv">$ </span>rvm install veewee
+</span><span class='line'><span class="nv">$ </span>gem install veewee
 </span><span class='line'><span class="nv">$ </span>which vagrant
 </span><span class='line'>/Users/seletz/.rvm/gems/ruby-1.9.2-p290@veewee192/bin/vagrant
 </span></code></pre></td></tr></table></div></figure>
 
+
+<p><strong>EDIT: the first version of this post had an error in the above
+statements.  Thanks, oliver!</strong></p>
 
 <p>So, whenever I want to use <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> with the <a href="https://github.com/jedi4ever/veewee" title="veewee">veewee</a> extension, I need to
 do a:</p>
@@ -102,7 +105,7 @@ specify a <em>ISO</em> image, and thus <a href="https://github.com/jedi4ever/vee
 directory for us:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>vagrant build <span class="s1">&#39;myubuntubox&#39;</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>vagrant basebox build <span class="s1">&#39;myubuntubox&#39;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
