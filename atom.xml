@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://seletz.github.com/atom.xml" rel="self"/>
   <link href="http://seletz.github.com/"/>
-  <updated>2012-01-17T18:36:50+01:00</updated>
+  <updated>2012-01-18T14:59:11+01:00</updated>
   <id>http://seletz.github.com/</id>
   <author>
     <name><![CDATA[Stefan Eletzhofer]]></name>
@@ -18,9 +18,9 @@
     <link href="http://seletz.github.com/blog/2012/01/17/creating-vagrant-base-boxes-with-veewee/"/>
     <updated>2012-01-17T08:26:00+01:00</updated>
     <id>http://seletz.github.com/blog/2012/01/17/creating-vagrant-base-boxes-with-veewee</id>
-    <content type="html"><![CDATA[<p>In this post I show how to install and use <a href="https://github.com/jedi4ever/veewee" title="veewee">veewee</a> to create a new
-base box for <a href="https://www.vagrantup.com" title="vagrant">vagrant</a>.  Then I&#8217;ll show how to use this new base box to
-create a <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> setup.</p>
+    <content type="html"><![CDATA[<p>In this post I show how to install and use <a href="http://github.com/jedi4ever/veewee" title="veewee">veewee</a> to create a new
+base box for <a href="http://www.vagrantup.com" title="vagrant">vagrant</a>.  Then I&#8217;ll show how to use this new base box to
+create a <a href="http://www.vagrantup.com" title="vagrant">vagrant</a> setup.</p>
 
 <!-- more -->
 
@@ -36,7 +36,7 @@ me.</p>
 
 <p>So it seems that <code>rvm</code> is some kind of ruby&#8217;s <code>virtualenv</code>.  Let&#8217;s setup a
 new environment using ruby 1.9.2, and then create a <code>gemset</code> which we&#8217;ll
-use to install <a href="https://github.com/jedi4ever/veewee" title="veewee">veewee</a> with :</p>
+use to install <a href="http://github.com/jedi4ever/veewee" title="veewee">veewee</a> with :</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -56,7 +56,7 @@ use to install <a href="https://github.com/jedi4ever/veewee" title="veewee">veew
 <p><strong>EDIT: the first version of this post had an error in the above
 statements.  Thanks, oliver!</strong></p>
 
-<p>So, whenever I want to use <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> with the <a href="https://github.com/jedi4ever/veewee" title="veewee">veewee</a> extension, I need to
+<p>So, whenever I want to use <a href="http://www.vagrantup.com" title="vagrant">vagrant</a> with the <a href="http://github.com/jedi4ever/veewee" title="veewee">veewee</a> extension, I need to
 do a:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -68,7 +68,7 @@ do a:</p>
 
 <h2>Testing</h2>
 
-<p><a href="https://github.com/jedi4ever/veewee" title="veewee">veewee</a> promises that it can build <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> base boxes from <em>scratch</em>
+<p><a href="http://github.com/jedi4ever/veewee" title="veewee">veewee</a> promises that it can build <a href="http://www.vagrantup.com" title="vagrant">vagrant</a> base boxes from <em>scratch</em>
 using templates.  Let&#8217;s test this and select a <em>ubuntu 11.04 64 bit
 &#8220;natty&#8221;</em> template:</p>
 
@@ -95,13 +95,13 @@ using templates.  Let&#8217;s test this and select a <em>ubuntu 11.04 64 bit
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><a href="https://github.com/jedi4ever/veewee" title="veewee">veewee</a> created a directory <code>definitions</code> for us, which is basically a
+<p><a href="http://github.com/jedi4ever/veewee" title="veewee">veewee</a> created a directory <code>definitions</code> for us, which is basically a
 copy of the template we selected.  We <em>could</em> change the definitions, but
 we&#8217;ll do that later &#8211; I&#8217;ll just want to see if the basic process works.</p>
 
 <p>Now let&#8217;s actually <em>build</em> the VM image which will eventually become our
-new <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> base box.  We did not change the definitions, and we did&#8217;nt
-specify a <em>ISO</em> image, and thus <a href="https://github.com/jedi4ever/veewee" title="veewee">veewee</a> will download it to a <code>iso</code>
+new <a href="http://www.vagrantup.com" title="vagrant">vagrant</a> base box.  We did not change the definitions, and we did&#8217;nt
+specify a <em>ISO</em> image, and thus <a href="http://github.com/jedi4ever/veewee" title="veewee">veewee</a> will download it to a <code>iso</code>
 directory for us:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -109,12 +109,12 @@ directory for us:</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>It&#8217;s quite spectacular &#8211; the image will be booted and <a href="https://github.com/jedi4ever/veewee" title="veewee">veewee</a> will use
+<p>It&#8217;s quite spectacular &#8211; the image will be booted and <a href="http://github.com/jedi4ever/veewee" title="veewee">veewee</a> will use
 VBoxManage to send keystrokes to the VM &#8211; defining initial boot parameters
 etc.  The net result is, that <code>veewe</code> will do a complete <em>headless</em>
 install of the specified template (a ubuntu &#8220;natty&#8221; 64 bit server image in
 this test) and install all the dependencies needed for the image to act as
-a <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> box.</p>
+a <a href="http://www.vagrantup.com" title="vagrant">vagrant</a> box.</p>
 
 <p>Let&#8217;s verify the created image using the <code>verify</code> command:</p>
 
@@ -142,7 +142,7 @@ failing spec regarding <code>chef</code> &#8211; I don&#8217;t plan to se <code>
 so I&#8217;ll ignore this.</p>
 
 <p>Up until now, all we have is a VirtualBox VM.  Now let&#8217;s export the VM
-to an actual <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> box file:</p>
+to an actual <a href="http://www.vagrantup.com" title="vagrant">vagrant</a> box file:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -217,7 +217,7 @@ and some meta data.</p>
 vagrant setup.  We could upload that box file to a local HTTP server or
 something like that.  The <code>vagrant add</code> command takes a URL or a path.</p>
 
-<p>OK, let&#8217;s add the box, so that we can use it to create <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> machines:</p>
+<p>OK, let&#8217;s add the box, so that we can use it to create <a href="http://www.vagrantup.com" title="vagrant">vagrant</a> machines:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -321,7 +321,7 @@ something like that.  The <code>vagrant add</code> command takes a URL or a path
 
 <p>Wohooo!  Look&#8217;s like we&#8217;re in business!</p>
 
-<p><a href="https://www.vagrantup.com" title="vagrant">vagrant</a> created a <em>new</em> VM based on the <em>myubuntubox</em>, fired it up,
+<p><a href="http://www.vagrantup.com" title="vagrant">vagrant</a> created a <em>new</em> VM based on the <em>myubuntubox</em>, fired it up,
 configured a host-only network device, and configured port-forwarding such
 that we have SSH access.  Other than the port <code>2222</code> being forwarded the
 machine is completely isolated.  The VM is also started in <em>headless</em> mode.</p>
@@ -405,15 +405,15 @@ command <code>vagrant init</code> did create:</p>
 <p>A quite few things are of interest here:</p>
 
 <ul>
-<li><p>we&#8217;re able to ssh in w/o specifying a password.  <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> uses
+<li><p>we&#8217;re able to ssh in w/o specifying a password.  <a href="http://www.vagrantup.com" title="vagrant">vagrant</a> uses
 public key authentication, and per default uses an private key which
-lies inside the <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> gem.</p></li>
+lies inside the <a href="http://www.vagrantup.com" title="vagrant">vagrant</a> gem.</p></li>
 <li><p>we&#8217;re able to do a <code>sudo</code> w/o specifying a password.</p></li>
 <li><p>There&#8217;s a <code>/vagrant</code> directory mounted.</p></li>
 </ul>
 
 
-<p>The <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> mount point is actually a VirtualBox shared folder, and is
+<p>The <a href="http://www.vagrantup.com" title="vagrant">vagrant</a> mount point is actually a VirtualBox shared folder, and is
 connected to our local <code>tst</code> folder, the one which contains the generated
 <code>Vagrantfile</code>!  This will come in quite handy later when we&#8217;re start to
 provision things.</p>
@@ -470,13 +470,13 @@ provision things.</p>
 <p>OK, let&#8217;s recap.</p>
 
 <ul>
-<li><p>Using <a href="https://github.com/jedi4ever/veewee" title="veewee">veewee</a> one can create a <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> base box with very minimal
+<li><p>Using <a href="http://github.com/jedi4ever/veewee" title="veewee">veewee</a> one can create a <a href="http://www.vagrantup.com" title="vagrant">vagrant</a> base box with very minimal
 effort.  All the gory details are handled for us:</p>
 
 <ul>
 <li><p>downloading the ISO file</p></li>
 <li><p>A headless install of the base box</p></li>
-<li><p>Installation of all the <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> dependencies into that VM</p></li>
+<li><p>Installation of all the <a href="http://www.vagrantup.com" title="vagrant">vagrant</a> dependencies into that VM</p></li>
 <li><p>Installation of the VirtualBox Guest Additions in the correct, matching
 version.</p></li>
 <li><p>we can choose amongst a vast number of templates (64 templates as of
@@ -486,7 +486,7 @@ version.</p></li>
 <li><p>we can probably customize and tweak templates</p></li>
 </ul>
 </li>
-<li><p>Using <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> we can create <em>new</em> machines at will, with very minimal
+<li><p>Using <a href="http://www.vagrantup.com" title="vagrant">vagrant</a> we can create <em>new</em> machines at will, with very minimal
 configuration</p></li>
 <li><p>We only ever need to check in the <code>Vagrantfile</code> to our source repository,
 and all developers can just do a <code>vagrant up</code> and have their machines for
@@ -634,9 +634,9 @@ Well, that&#8217;s what <em>provisioning</em> is for.</p>
 
 <h2>Provisioning</h2>
 
-<p>OK, let&#8217;s use the <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> shell provisiooning to install <code>RabbitMQ</code>.  For
+<p>OK, let&#8217;s use the <a href="http://www.vagrantup.com" title="vagrant">vagrant</a> shell provisiooning to install <code>RabbitMQ</code>.  For
 this, all we need to do is to create a shell script and place it next to
-the <code>Vagrantfile</code> and tell <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> about it.  When doing a <code>vagrant up</code>,
+the <code>Vagrantfile</code> and tell <a href="http://www.vagrantup.com" title="vagrant">vagrant</a> about it.  When doing a <code>vagrant up</code>,
 the script will be executed and we&#8217;re set.</p>
 
 <p>This is the script:</p>
@@ -716,7 +716,7 @@ running:</p>
 <ul>
 <li><p>We were able to install a multi-machine, isolated VM setup for test and
 development using 15 lines of configuration</p></li>
-<li><p>The <em>provisioning</em> step is just telling <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> the name of the shell
+<li><p>The <em>provisioning</em> step is just telling <a href="http://www.vagrantup.com" title="vagrant">vagrant</a> the name of the shell
 script to execute</p></li>
 <li><p>The scripts used in provisioning were located next to the <code>Vagrantfile</code>
 (i.e <em>not</em> inside the VM), and thus can be checked in.</p></li>
@@ -725,7 +725,7 @@ script to execute</p></li>
 
 <h2>Conclusion</h2>
 
-<p>I think <a href="https://www.vagrantup.com" title="vagrant">vagrant</a> is great.  And <a href="https://github.com/jedi4ever/veewee" title="veewee">veewee</a> allows for hassle-free base boxes
+<p>I think <a href="http://www.vagrantup.com" title="vagrant">vagrant</a> is great.  And <a href="http://github.com/jedi4ever/veewee" title="veewee">veewee</a> allows for hassle-free base boxes
 to be set up, so no more downloading from untrusted sources!</p>
 
 <p>I&#8217;ll definitely continue to integrate these systems in my task to get a
