@@ -2,7 +2,7 @@
 	var root = this;
 
 	var SopaBlackout = function(){};
-	vared addEvent = function(obj, type, fn, ref_obj){
+	var	addEvent = function(obj, type, fn, ref_obj){
 		if (obj.addEventListener){
 			obj.addEventListener(type, fn, false);
 		}else if (obj.attachEvent){
@@ -128,26 +128,26 @@
 		var offsets = findPos(obj);
 
 		var blackout = create('div', {
-position: 'absolute',
-top: offsets[1],
-width: '100%',
-backgroundColor: 'black',
-textAlign: 'center',
-paddingTop: '10px',
-zIndex: SopaBlackout.ZINDEX,
-height: height,
-color: '#999'},
-create('h1', {color: '#999'}, txt(SopaBlackout.HEADER_TEXT)),
-create('p', null,
-txt("Keep the web open. "),
-create('a', {href: "https://wfc2.wiredforchange.com/o/9042/p/dia/action/public/?action_KEY=8173"}, txt("Contact your representatives")),
-txt(" or "),
-create('a', {href: "http://sopablackout.org/learnmore"}, txt("find out more")))
-);
+				position: 'absolute',
+				top: offsets[1],
+				width: '100%',
+				backgroundColor: 'black',
+				textAlign: 'center',
+				paddingTop: '10px',
+				zIndex: SopaBlackout.ZINDEX,
+				height: height,
+				color: '#999'},
+			create('h1', {color: '#999'}, txt(SopaBlackout.HEADER_TEXT)),
+			create('p', null,
+				txt("Keep the web open. "),
+			create('a', {href: "https://wfc2.wiredforchange.com/o/9042/p/dia/action/public/?action_KEY=8173"}, txt("Contact your representatives")),
+				txt(" or "),
+				create('a', {href: "http://sopablackout.org/learnmore"}, txt("find out more")))
+		);
 		if (opts['srsbzns'] !== true){
 			blackout.appendChild(create('p', {paddingTop: '250px', color: '#333'}, txt(SopaBlackout.CONTINUE_TEXT)));
 			addEvent(blackout, 'click', function(e){
-body.removeChild(blackout);
+				body.removeChild(blackout);
 			});
 		}
 		body.appendChild(blackout);
