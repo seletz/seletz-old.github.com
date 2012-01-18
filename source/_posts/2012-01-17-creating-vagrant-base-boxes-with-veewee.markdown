@@ -494,6 +494,6 @@ more complete test setup, including a headless CI setup with multiple
 machines.  Together with something like `phantom.js` we can even create
 screen shots in headless mode, such that we can peek at them errors ...
 
-[1]: https://github.com/jedi4ever/veewee 			"veewee"
-[2]: https://www.vagrantup.com 					"vagrant"
+[1]: http://github.com/jedi4ever/veewee 			 "veewee"
+[2]: http://www.vagrantup.com 					 "vagrant"
 [3]: https://rvm.beginrescueend.com/                             "rvm documentation"
