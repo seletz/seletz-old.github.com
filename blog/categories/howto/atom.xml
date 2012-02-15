@@ -4,7 +4,7 @@
   <title><![CDATA[Category: howto | My Octopress Blog]]></title>
   <link href="http://seletz.github.com/blog/categories/howto/atom.xml" rel="self"/>
   <link href="http://seletz.github.com/"/>
-  <updated>2012-01-20T13:43:52+01:00</updated>
+  <updated>2012-02-15T09:17:05+01:00</updated>
   <id>http://seletz.github.com/</id>
   <author>
     <name><![CDATA[Stefan Eletzhofer]]></name>
@@ -31,7 +31,7 @@ I found a nice little setup on <em>github</em>: <a href="https://github.com/robb
 <pre><code>$ brew install zsh
 $ cd $HOME
 $ git clone https://github.com/robbyrussell/oh-my-zsh.git .oh-my-zsh
-$ sudo chsh zsh
+$ sudo chsh -s zsh yourusernamehere
 </code></pre>
 
 <h2>Configuration</h2>
