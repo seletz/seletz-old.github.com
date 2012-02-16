@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://seletz.github.com/atom.xml" rel="self"/>
   <link href="http://seletz.github.com/"/>
-  <updated>2012-02-15T09:17:05+01:00</updated>
+  <updated>2012-02-16T09:32:59+01:00</updated>
   <id>http://seletz.github.com/</id>
   <author>
     <name><![CDATA[Stefan Eletzhofer]]></name>
@@ -12,6 +12,67 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Creating a RabbitMQ test setup with vagrant]]></title>
+    <link href="http://seletz.github.com/blog/2012/01/18/creating-a-rabbitmq-test-setup-with-vagrant/"/>
+    <updated>2012-01-18T16:00:00+01:00</updated>
+    <id>http://seletz.github.com/blog/2012/01/18/creating-a-rabbitmq-test-setup-with-vagrant</id>
+    <content type="html"><![CDATA[<p>In this post I&#8217;ll provide a writeup on how I created a test setup for
+a project I&#8217;m working on.  The project uses <a href="http://www.rabbitmq.com/" title="RabbitMQ">RabbitMQ</a> to distribute
+tasks to a worker, and the production system is a cluster of Apache/Tomcat
+machines.</p>
+
+<p>I&#8217;ll use <a href="http://vagrantup.com/" title="vagrant">vagrant</a> to create two test machines, one which runs <a href="http://www.rabbitmq.com/" title="RabbitMQ">RabbitMQ</a>, the other
+one will run the actual worker code.</p>
+
+<!-- more -->
+
+
+<h2>Preparation</h2>
+
+<p>I&#8217;ll have the <a href="http://vagrantup.com/" title="vagrant">vagrant</a> files in a subdirectory <code>vagrant</code> in my git repository.  I&#8217;ll
+add the <code>Vagrantfile</code> and all provisioning scriptzs there::</p>
+
+<pre><code>$ mkdir vagrant
+</code></pre>
+
+<p>The <code>Vagrantfile</code> looks like this::</p>
+
+<p>File /Users/seletz/develop/octopress/source/downloads/code/ruby/Vagrantfile-rabbitmq could not be found</p>
+
+<p>The configuration sets the machines up, such that:</p>
+
+<ul>
+<li>both have a IP to talk to eachother</li>
+<li>on the rabbitmq machine I&#8217;ve used the shell provisioner to install
+<a href="http://www.rabbitmq.com/" title="RabbitMQ">RabbitMQ</a> 2.7.1</li>
+<li>on the worker machine I&#8217;ve used the shell provisioner to create a python
+development environment in /opt</li>
+<li>share my source folder on the worker</li>
+</ul>
+
+
+<p>Note: For some reason I wanted to have all the <a href="http://vagrantup.com/" title="vagrant">vagrant</a> stuff in a separate directory.  I
+<strong>could</strong> have put the Vagrantfile in the top-level directory and thus saved me the additional
+shared folder.  Oh well.</p>
+
+<p>Here are the provisioning shell scripts::</p>
+
+<p>File /Users/seletz/develop/octopress/source/downloads/code/shell/vagrant-rabbitmq.sh could not be found</p>
+
+<p>File /Users/seletz/develop/octopress/source/downloads/code/shell/vagrant-worker.sh could not be found</p>
+
+<h2>Usage</h2>
+
+<p>To use the system I now just need to do a::</p>
+
+<pre><code>$ vagrant up
+</code></pre>
+
+<p>And I&#8217;m set.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Creating Vagrant Base Boxes With veewee]]></title>
@@ -1032,8 +1093,11 @@ I found a nice little setup on <em>github</em>: <a href="https://github.com/robb
 <pre><code>$ brew install zsh
 $ cd $HOME
 $ git clone https://github.com/robbyrussell/oh-my-zsh.git .oh-my-zsh
-$ sudo chsh -s zsh yourusernamehere
+$ sudo chsh -s /usr/local/bin/zsh yourusernamehere
 </code></pre>
+
+<p><strong>NOTE:</strong>
+  You may need to edit <code>/etc/shells</code> to have <code>/usr/local/bin/zsh</code>.</p>
 
 <h2>Configuration</h2>
 
