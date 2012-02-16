@@ -1,0 +1,528 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>switch from bash to zsh - My Octopress Blog</title>
+  <meta name="author" content="Stefan Eletzhofer">
+
+  
+  <meta name="description" content="I finally came around to switch from bash to zsh. While reading hacker news
+I found a nice little setup on github: oh-my-zsh Installation &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://seletz.github.com/blog/2012/01/06/switch-from-bash-to-zsh">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.cm/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="http://js.sopablackout.org/sopablackout.js"></script>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-28179328-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">My Octopress Blog</a></h1>
+  
+    <h2>I'm no longer young but I still need the money.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:seletz.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Switch From Bash to Zsh</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-01-06T13:03:00+01:00" pubdate data-updated="true">2012-01-06</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>I finally came around to switch from <code>bash</code> to <code>zsh</code>.  While reading <a href="https://news.ycombinator.com" title="hackernews">hacker news</a>
+I found a nice little setup on <em>github</em>: <a href="https://github.com/robbyrussell/oh-my-zsh" title="oh-my-zsh">oh-my-zsh</a></p>
+
+<!-- more -->
+
+
+<h2>Installation</h2>
+
+<p>Installation was quite easy:</p>
+
+<pre><code>$ brew install zsh
+$ cd $HOME
+$ git clone https://github.com/robbyrussell/oh-my-zsh.git .oh-my-zsh
+$ sudo chsh -s zsh yourusernamehere
+</code></pre>
+
+<h2>Configuration</h2>
+
+<p>I did very little configuration.  All I really did is to choose a nice
+theme from the many available themes.  Anyhow, my <code>.zshrc</code> looks like this:</p>
+
+<figure class='code'><figcaption><span>.zshrc (zshrc)</span> <a href='/downloads/code/shell/zshrc'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># Path to your oh-my-zsh configuration.</span>
+</span><span class='line'><span class="nv">ZSH</span><span class="o">=</span><span class="nv">$HOME</span>/.oh-my-zsh
+</span><span class='line'>
+</span><span class='line'><span class="c"># Set name of the theme to load.</span>
+</span><span class='line'><span class="c"># Look in ~/.oh-my-zsh/themes/</span>
+</span><span class='line'><span class="c"># Optionally, if you set this to &quot;random&quot;, it&#39;ll load a random theme each</span>
+</span><span class='line'><span class="c"># time that oh-my-zsh is loaded.</span>
+</span><span class='line'><span class="nv">ZSH_THEME</span><span class="o">=</span><span class="s2">&quot;nanotech&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Example aliases</span>
+</span><span class='line'><span class="c"># alias zshconfig=&quot;mate ~/.zshrc&quot;</span>
+</span><span class='line'><span class="c"># alias ohmyzsh=&quot;mate ~/.oh-my-zsh&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Set to this to use case-sensitive completion</span>
+</span><span class='line'><span class="c"># CASE_SENSITIVE=&quot;true&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Comment this out to disable weekly auto-update checks</span>
+</span><span class='line'><span class="c"># DISABLE_AUTO_UPDATE=&quot;true&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Uncomment following line if you want to disable colors in ls</span>
+</span><span class='line'><span class="c"># DISABLE_LS_COLORS=&quot;true&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Uncomment following line if you want to disable autosetting terminal title.</span>
+</span><span class='line'><span class="c"># DISABLE_AUTO_TITLE=&quot;true&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Uncomment following line if you want red dots to be displayed while waiting for completion</span>
+</span><span class='line'><span class="c"># COMPLETION_WAITING_DOTS=&quot;true&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)</span>
+</span><span class='line'><span class="c"># Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/</span>
+</span><span class='line'><span class="c"># Example format: plugins=(rails git textmate ruby lighthouse)</span>
+</span><span class='line'><span class="nv">plugins</span><span class="o">=(</span>osx git git-flow fabric groovy grails python<span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">source</span> <span class="nv">$ZSH</span>/oh-my-zsh.sh
+</span><span class='line'>
+</span><span class='line'><span class="c"># Customize to your needs...</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#---------------------------------------------------------------------</span>
+</span><span class='line'><span class="c"># prompt and path</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span>~/bin:/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:<span class="nv">$PATH</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#---------------------------------------------------------------------</span>
+</span><span class='line'><span class="c"># env setup</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">LANG</span><span class="o">=</span><span class="s2">&quot;de_DE.UTF-8&quot;</span>
+</span><span class='line'><span class="c"># gnuchlog vim plugin</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">EMAIL</span><span class="o">=</span><span class="s2">&quot;Stefan Eletzhofer &lt;stefan.eletzhofer@nexiles.de&gt;&quot;</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">EDITOR</span><span class="o">=</span><span class="s2">&quot;/Applications/MacVim.app/Contents/MacOS/Vim -g -f &quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#---------------------------------------------------------------------</span>
+</span><span class='line'><span class="c"># python</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">PYTHONSTARTUP</span><span class="o">=</span>~/.pyinit
+</span><span class='line'>
+</span><span class='line'><span class="nb">export </span><span class="nv">VIRTUALENVWRAPPER_PYTHON</span><span class="o">=</span>/usr/bin/python2.6
+</span><span class='line'><span class="nb">export </span><span class="nv">WORKON_HOME</span><span class="o">=</span>~/.virtualenvs
+</span><span class='line'><span class="nb">export </span><span class="nv">PROJECT_HOME</span><span class="o">=</span><span class="nv">$HOME</span>/develop
+</span><span class='line'><span class="nb">export </span><span class="nv">VIRTUALENV_ROOT</span><span class="o">=</span><span class="nv">$WORKON_HOME</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">export </span><span class="nv">JYTHON_HOME</span><span class="o">=</span><span class="k">$(</span>brew --prefix jython<span class="k">)</span>/libexec
+</span><span class='line'><span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:<span class="nv">$JYTHON_HOME</span>/bin
+</span><span class='line'>
+</span><span class='line'>. /usr/local/bin/virtualenvwrapper.sh
+</span><span class='line'>
+</span><span class='line'><span class="c">#---------------------------------------------------------------------</span>
+</span><span class='line'><span class="c"># NODE.JS</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">NODE_PATH</span><span class="o">=</span>/usr/local/lib/node
+</span><span class='line'><span class="nb">export </span><span class="nv">JS_CMD</span><span class="o">=</span>node
+</span><span class='line'>
+</span><span class='line'><span class="c">#---------------------------------------------------------------------</span>
+</span><span class='line'><span class="c"># Ruby RVM</span>
+</span><span class='line'><span class="nb">source</span> ~/.rvm/scripts/rvm
+</span><span class='line'>
+</span><span class='line'><span class="c">#---------------------------------------------------------------------</span>
+</span><span class='line'><span class="c"># GROOVY</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">GROOVY_HOME</span><span class="o">=</span><span class="k">$(</span>brew --prefix groovy<span class="k">)</span>/libexec
+</span><span class='line'>
+</span><span class='line'><span class="c">#---------------------------------------------------------------------</span>
+</span><span class='line'><span class="c"># alias</span>
+</span><span class='line'><span class="nb">alias </span><span class="nv">ls</span><span class="o">=</span><span class="s2">&quot;gls --color&quot;</span>
+</span><span class='line'><span class="nb">alias </span><span class="nv">la</span><span class="o">=</span><span class="s2">&quot;ls -la&quot;</span>
+</span><span class='line'><span class="nb">alias </span><span class="nv">ll</span><span class="o">=</span><span class="s2">&quot;ls -l&quot;</span>
+</span><span class='line'><span class="nb">alias </span><span class="nv">serve</span><span class="o">=</span><span class="s2">&quot;python -mSimpleHTTPServer&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#---------------------------------------------------------------------</span>
+</span><span class='line'><span class="c"># direnv hook</span>
+</span><span class='line'><span class="nb">eval</span> <span class="sb">`</span>direnv hook <span class="nv">$0</span><span class="sb">`</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here&#8217;s how my terminal looks like now.  I&#8217;m using the <a href="http://ethanschoonover.com/solarized" title="solarized">solarized</a> colour scheme,
+and i&#8217;m using the <code>nanotech</code> theme:</p>
+
+<p><img class="center" src="http://dl.dropbox.com/u/154097/blog-images/zsh-theme.jpg" title="my zsh theme" alt="zsh terminal screenshot"></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Stefan Eletzhofer</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-01-06T13:03:00+01:00" pubdate data-updated="true">2012-01-06</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/howto/'>howto</a>, <a class='category' href='/blog/categories/tools/'>tools</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://seletz.github.com/blog/2012/01/06/switch-from-bash-to-zsh/" data-via="seletz" data-counturl="http://seletz.github.com/blog/2012/01/06/switch-from-bash-to-zsh/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/01/05/experiments-with-groovy/" title="Previous Post: experiments with groovy">&laquo; experiments with groovy</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/01/08/groovy-scripting-pdmlink/" title="next Post: groovy: scripting PDMlink">groovy: scripting PDMlink &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/01/17/creating-vagrant-base-boxes-with-veewee/">Creating Vagrant Base Boxes With veewee</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/01/08/groovy-scripting-pdmlink/">groovy: scripting PDMlink</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/01/06/switch-from-bash-to-zsh/">switch from bash to zsh</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/01/05/experiments-with-groovy/">experiments with groovy</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("seletz", 4, true);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/seletz" class="twitter-follow-button" data-show-count="false">Follow @seletz</a>
+  
+</section>
+
+
+<section>
+  <h1>Github Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/seletz">@seletz</a> on Github
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'seletz',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/106477632016330375313?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 &mdash; Stefan Eletzhofer &mdash;
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span> &mdash;
+  <span class="credit"><a href="/imprint">impressum</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'seletz';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://seletz.github.com/blog/2012/01/06/switch-from-bash-to-zsh/';
+        var disqus_url = 'http://seletz.github.com/blog/2012/01/06/switch-from-bash-to-zsh/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+function setup_classpath()
+{
+	for jar in $(find $WT_HOME/codebase/WEB-INF -name "*.jar"); do
+		cp=$cp:$jar
+	done
+}
+
+setup_classpath
+
+echo "export CLASSPATH=$cp:$WT_HOME/codebase"
