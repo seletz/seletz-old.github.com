@@ -21,7 +21,10 @@ Installation was quite easy:
 	$ brew install zsh
 	$ cd $HOME
 	$ git clone https://github.com/robbyrussell/oh-my-zsh.git .oh-my-zsh
-	$ sudo chsh zsh
+	$ sudo chsh -s /usr/local/bin/zsh yourusernamehere
+
+**NOTE:**
+  You may need to edit `/etc/shells` to have `/usr/local/bin/zsh`.
 
 Configuration
 -------------
