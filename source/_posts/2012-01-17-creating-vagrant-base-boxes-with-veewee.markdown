@@ -10,7 +10,7 @@ In this post I show how to install and use [veewee] [1] to create a new
 base box for [vagrant] [2].  Then I'll show how to use this new base box to
 create a [vagrant] [2] setup.
 
-<!-- more -->>
+<!-- more -->
 
 Installing to a ruby rvm gemset
 -------------------------------
