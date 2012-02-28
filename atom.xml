@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://seletz.github.com/atom.xml" rel="self"/>
   <link href="http://seletz.github.com/"/>
-  <updated>2012-02-25T15:29:23+01:00</updated>
+  <updated>2012-02-28T09:05:16+01:00</updated>
   <id>http://seletz.github.com/</id>
   <author>
     <name><![CDATA[Stefan Eletzhofer]]></name>
@@ -12,6 +12,158 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Jython, Oracle and JDBC]]></title>
+    <link href="http://seletz.github.com/blog/2012/02/28/jython-oracle-jdbc/"/>
+    <updated>2012-02-28T08:21:00+01:00</updated>
+    <id>http://seletz.github.com/blog/2012/02/28/jython-oracle-jdbc</id>
+    <content type="html"><![CDATA[<p>I recently had the need to access a new table in an existing oracle database
+using Jython.  I needed to atomically increase a field in for <strong>one</strong> row.</p>
+
+<p>Here is what I came up with.</p>
+
+<!-- more -->
+
+
+<h2>Notes</h2>
+
+<ul>
+<li><p>The demo code relies on a existing table &#8216;NXTEST&#8217; in oracle.  I used navicat lite
+to create this table.</p></li>
+<li><p>The demo code locks a table row using &#8216;select &#8230; for update&#8217; to atomically increase
+the SEQ column.</p></li>
+<li><p>The requirement was that I could have a huge number of <code>name</code> entries,
+all slightly different, each needing a separate counter.  I did&#8217;nt want
+to create a <code>sequence</code> for each of them.</p></li>
+</ul>
+
+
+<h2>Gotchas</h2>
+
+<ul>
+<li><p>Apparently oracle <em>needs</em> upper cased table and column names.</p></li>
+<li><p>I could not get oci connections to work.  This seems to be a <a href="https://forums.oracle.com/forums/thread.jspa?threadID=1080064" title="bug in 10.2">bug in 10.2</a></p></li>
+<li><p>Because of a bug in Jython 2.5.2 wrt <code>__import__</code> I could not get
+SQLAlchemy to work.</p></li>
+</ul>
+
+
+<figure class='code'><figcaption><span>jython-oracle-jdbs.py (jdbc-oracle.py)</span> <a href='http://seletz.github.com/downloads/code/python/jdbc-oracle.py'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">with_statement</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">logging</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">com.ziclix.python.sql</span> <span class="kn">import</span> <span class="n">zxJDBC</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&quot;nexiles.wt.demo&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">setup_logging</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+</span><span class='line'>    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&quot;</span><span class="si">%(asctime)s</span><span class="s"> [</span><span class="si">%(levelname)-7s</span><span class="s">] [line </span><span class="si">%(lineno)d</span><span class="s">] </span><span class="si">%(name)s</span><span class="s">: </span><span class="si">%(message)s</span><span class="s">&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">get_connection</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+</span><span class='line'>    <span class="n">jdbc_url</span> <span class="o">=</span> <span class="s">&quot;jdbc:oracle:thin:@</span><span class="si">%(host)s</span><span class="s">:</span><span class="si">%(port)s</span><span class="s">:</span><span class="si">%(sid)s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">locals</span><span class="p">()</span>
+</span><span class='line'>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;get_connection: jdbc_url=</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">jdbc_url</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">driver</span> <span class="o">=</span> <span class="s">&quot;oracle.jdbc.driver.OracleDriver&quot;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">zxJDBC</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">jdbc_url</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">driver</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">update_sequence</span><span class="p">(</span><span class="n">cursor</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+</span><span class='line'>    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select NAME, SEQ from NXTEST where name = ? for update&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">name</span><span class="p">])</span>
+</span><span class='line'>    <span class="n">result</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+</span><span class='line'>    <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+</span><span class='line'>        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;UPDATE: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;update NXTEST set seq = seq + 1 where name = ?&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">name</span><span class="p">])</span>
+</span><span class='line'>    <span class="k">else</span><span class="p">:</span>
+</span><span class='line'>        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;CREATE: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;insert into NXTEST values (?, ?)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">name</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select NAME, SEQ from NXTEST where name = ?&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">name</span><span class="p">])</span>
+</span><span class='line'>    <span class="n">result</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+</span><span class='line'>    <span class="n">_</span><span class="p">,</span> <span class="n">seq</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span class='line'>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;NAME: </span><span class="si">%s</span><span class="s"> =&gt; SEQ </span><span class="si">%03d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">seq</span><span class="p">))</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">seq</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+</span><span class='line'>    <span class="n">username</span> <span class="o">=</span> <span class="s">&quot;****&quot;</span>
+</span><span class='line'>    <span class="n">password</span> <span class="o">=</span> <span class="s">&quot;****&quot;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">with</span> <span class="n">get_connection</span><span class="p">(</span><span class="s">&quot;example.com&quot;</span><span class="p">,</span> <span class="mi">1521</span><span class="p">,</span> <span class="s">&quot;orc4&quot;</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+</span><span class='line'>        <span class="k">with</span> <span class="n">conn</span><span class="p">:</span>
+</span><span class='line'>            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;connection: </span><span class="si">%r</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">conn</span><span class="p">)</span>
+</span><span class='line'>            <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">c</span><span class="p">:</span>
+</span><span class='line'>                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;cursor: </span><span class="si">%r</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">c</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="n">update_sequence</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s">&quot;test-foo-bar&quot;</span><span class="p">)</span>
+</span><span class='line'>                <span class="n">update_sequence</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s">&quot;test-foo-bar&quot;</span><span class="p">)</span>
+</span><span class='line'>                <span class="n">update_sequence</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s">&quot;test-bar-bar&quot;</span><span class="p">)</span>
+</span><span class='line'>                <span class="n">update_sequence</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s">&quot;test-bar-bar&quot;</span><span class="p">)</span>
+</span><span class='line'>                <span class="n">update_sequence</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s">&quot;flirz-foo-bar&quot;</span><span class="p">)</span>
+</span><span class='line'>                <span class="n">update_sequence</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s">&quot;flirz-foo-bar&quot;</span><span class="p">)</span>
+</span><span class='line'>                <span class="n">update_sequence</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s">&quot;flirz-foo-bar&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+</span><span class='line'>    <span class="n">setup_logging</span><span class="p">()</span>
+</span><span class='line'>    <span class="n">main</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[z3c.recipe.staticlxml moved to git]]></title>
