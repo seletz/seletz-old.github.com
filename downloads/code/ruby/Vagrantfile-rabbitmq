@@ -1,0 +1,28 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby ts=2 sw=2 expandtab:
+
+Vagrant::Config.run do |config|
+
+  box = "ubuntu-natty-64"
+  config.vm.define :rabbitmq do |rabbit_config|
+    #rabbit_config.vm.boot_mode = :gui
+    rabbit_config.vm.box = box
+    rabbit_config.vm.network("192.168.64.10")
+    rabbit_config.vm.provision :shell, :path => "rabbitmq.sh"
+    rabbit_config.vm.customize do |vm|
+      vm.name = "nexiles - rabbitmq"
+    end
+  end
+
+  config.vm.define :worker do |worker_config|
+    worker_config.vm.box = box
+    #worker_config.vm.boot_mode = :gui
+    worker_config.vm.network("192.168.64.20")
+    worker_config.vm.provision :shell, :path => "worker.sh"
+    worker_config.vm.share_folder("src", "/src", "~/develop/nexiles/worker/src")
+    worker_config.vm.customize do |vm|
+      vm.name = "nexiles - worker"
+    end
+  end
+
+end
