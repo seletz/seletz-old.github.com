@@ -38,5 +38,31 @@ Gotchas
 
 {% include_code jython-oracle-jdbs.py python/jdbc-oracle.py lang:python %}
 
-[1]:  https://forums.oracle.com/forums/thread.jspa?threadID=1080064  "bug in 10.2"
+Edit
+----
 
+I retested `SQLAlchemy` using the recently [released] [2] `Jython-2.5.3b1`, and
+this version indeed fixes the `__import__` bug.
+
+Here's the `homebrew` recipe for it:
+
+{% include_code jython ruby/jython.rb lang:ruby %}
+
+FWIW, this shows how to connect to Oracle using `SQLAlchemy` and Jython.
+Thoe code below does **not** do the same thing as the one above (as in
+atomic increases of the SEQ column), however.
+
+{% include_code jython-oracle-jdbs.py python/jdbc-oracle-sqlalchemy.py lang:python %}
+
+Still, I see the following advantages using `SQLAlchemy` (other than having
+a pretty darn nifty ORM):
+
+- Class Mappers.  I like these.
+
+- `SQLAlchemy` hides all the magic Oracle stuff (Sequences, upper cased table
+  names)
+
+- Minor but handy: Optionally `SQLAlchemy` logs every SQL statement.
+
+[1]:  https://forums.oracle.com/forums/thread.jspa?threadID=1080064  "bug in 10.2"
+[2]:  http://downloads.sourceforge.net/project/jython/jython-dev/2.5.3b1/jython_installer-2.5.3b1.jar "released"
