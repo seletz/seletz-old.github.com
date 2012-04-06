@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rabbitmq | My Octopress Blog]]></title>
   <link href="http://seletz.github.com/blog/categories/rabbitmq/atom.xml" rel="self"/>
   <link href="http://seletz.github.com/"/>
-  <updated>2012-03-05T14:14:56+01:00</updated>
+  <updated>2012-04-06T19:27:52+02:00</updated>
   <id>http://seletz.github.com/</id>
   <author>
     <name><![CDATA[Stefan Eletzhofer]]></name>
@@ -39,7 +39,7 @@ add the <code>Vagrantfile</code> and all provisioning scriptzs there::</p>
 
 <p>The <code>Vagrantfile</code> looks like this::</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span><a href="http://vagrantup.com/" title="vagrant">vagrant</a>file (Vagrantfile-rabbitmq)</span> <a href='/downloads/code/ruby/Vagrantfile-rabbitmq'>download</a></figcaption>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>vagrant file (Vagrantfile-rabbitmq)</span> <a href='/downloads/code/ruby/Vagrantfile-rabbitmq'>download</a></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>

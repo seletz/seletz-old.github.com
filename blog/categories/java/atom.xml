@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: groovy | My Octopress Blog]]></title>
-  <link href="http://seletz.github.com/blog/categories/groovy/atom.xml" rel="self"/>
+  <title><![CDATA[Category: java | My Octopress Blog]]></title>
+  <link href="http://seletz.github.com/blog/categories/java/atom.xml" rel="self"/>
   <link href="http://seletz.github.com/"/>
   <updated>2012-04-06T19:27:52+02:00</updated>
   <id>http://seletz.github.com/</id>
@@ -12,6 +12,219 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Jython, classpath and virtualenv]]></title>
+    <link href="http://seletz.github.com/blog/2012/04/06/jython-classpath-virtualenv/"/>
+    <updated>2012-04-06T18:26:00+02:00</updated>
+    <id>http://seletz.github.com/blog/2012/04/06/jython-classpath-virtualenv</id>
+    <content type="html"><![CDATA[<p>I finally came around to investigate some long standing issues I have
+had with my Jython development environment, namely setting up the
+<strong>CLASSPATH</strong>.</p>
+
+<!-- more -->
+
+
+<h2>Background</h2>
+
+<p>I use <em>Jython</em> every day to develop customizations and tools for a big,
+enterprise class PLM System.  Working with this system involves setting up and
+running Virtual Machines which run a stripped-down installation of the <a href="http://www.ptc.com/product/windchill/pdmlink" title="PLM">PLM</a>
+System configured for a specific customer.</p>
+
+<p>I've set up some shared folders and some terminal sessions such that I can
+code using my development tools I know and love (Python, VIM and the
+Terminal).</p>
+
+<p>To be able to test code I develop, I want the code to run <strong>on my local
+machine</strong>, that is, I do <strong>not</strong> want to click-test inside the VM, restart
+tomcat and whatnot.  I just want to fire up the python REPL and get going, I
+want to insert some PDB breakpoints and develop in an agile fashion.  Test
+Driven, even.</p>
+
+<h2>The Problem</h2>
+
+<p>Up until recently, found that I needed to set up the <strong>CLASSPATH</strong> using a
+environment variable for all the coding sessions I did.  I created some
+wrapper scripts which deduced the correct <strong>CLASSPATH</strong> based on the currently
+running VM, the customer project and some further guessing.</p>
+
+<p>This always felt clumsy, but worked, for the most part.</p>
+
+<p>At the same time, I missed the goodness of <em>virtualenv</em>, which I used to love,
+which yelled to me something like:</p>
+
+<pre><code>$ virtualenv -p jython foo                                                                                                                                                                ] 6:43 pm
+Running virtualenv with interpreter /usr/local/bin/jython
+New jython executable in foo/bin/jython
+ERROR: The executable foo/bin/jython is not functioning
+ERROR: It thinks sys.prefix is u'/usr/local/Cellar/jython/2.5.3b1/libexec' (should be u'/Users/seletz/develop/tmp/foo')
+ERROR: virtualenv is not compatible with this system or executable
+</code></pre>
+
+<h2>Solution</h2>
+
+<p>Now I need to confess.  I recently started looking at some IDE, because I came
+across the need to code some Java for a customer project.  It seems to me,
+that coding Java w/o a IDE is a hardcore PITA, thus, is started to look at
+<em>NetBeans</em>, <em>Eclipse</em> and <em>IntelliJ</em> (stuff for another post).</p>
+
+<p>While testing testing IDEs I also tried to set them up for Python and Jython
+development.  Whatever, I found that I can have a isolated Jython environment
+using <em>virtualenv</em> and w/o manually setting the <strong>CLASSPATH</strong>.</p>
+
+<p>The error <em>virtualenv</em> gave me is simply due to the fact that I have
+<strong>JYTHON_HOME</strong> set up in my default ... WTF <a href="https://github.com/pypa/virtualenv/issues/185" title="issue">issue</a>?</p>
+
+<p>So, I just need to:</p>
+
+<pre><code>$ cd develop/tmp
+$ unset JYTHON_HOME
+$ virtualenv -p jython customer_1
+</code></pre>
+
+<p>And -- lo and behold -- we have a isolated Jython environment for
+<em>customer_1</em>, just like it should be.</p>
+
+<p>Poking further, I noticed that the <em>Jython registry</em> is also local, and, so
+is the 'site-packages' directory.  Google found a <a href="http://stackoverflow.com/questions/5839300/defining-a-classpath-for-a-jython-virtual-environment" title="post">post</a> about setting up
+the Jython <em>CLASSPATH</em>, and thus I created a 'windchill.pth' file in the
+'site-packages' directory:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>windchill.pth (windchill.pth)</span> <a href='/downloads/code/jython/windchill.pth'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>/Volumes/wt-vm-ptc/Windchill/lib/servlet.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/lib/CounterPart.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/lib/pjl.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/lib/scmi.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/lib/wnc.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/lib/pdml.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/WtHttpClientAddOns.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/WtJmxClientConn.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/borland.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/commons-collections.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/commons-lang.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/Gantt.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/JClass.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/log4j.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/magelang.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/pvxdriver.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/sfc.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/vecmath.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/xercesImpl.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/xmlParserAPIs.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/xpath.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/JWSUtil.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/pview.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/jviews-chart-all.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/jviews-gantt-all.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/jviews-framework-all.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/mpxj.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/activation.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/ie.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/ie3rdpartylibs.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/ieWeb.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/install.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/mail.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/wc3rdpartylibs.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/wncWeb.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/pdmlWeb.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/pjlWeb.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/PartsLink_L10N.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/jython.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/jdom.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/dom4j-1.5.2.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/Gantt.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/jviews-chart-all.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/jviews-framework-all.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/jviews-gantt-all.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/CounterPartWeb.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/prowtWeb.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/archiveWeb.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/archiveClientWeb.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/archiveServerWeb.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/dpimplWeb.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/InstallUtil.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/dpinfraWeb.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/json_simple-1.1.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/nexiles.tools.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/nexiles.settr.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Tomcat/lib/catalina.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Now I can just fire up the Jython interpreter like so:</p>
+
+<pre><code>$ cd develop/tmp/customer_1
+$ bin/jython
+Jython 2.5.3b1 (2.5:5fa0a5810b25, Feb 22 2012, 12:39:02) 
+[Java HotSpot(TM) 64-Bit Server VM (Apple Inc.)] on java1.6.0_31
+Type "help", "copyright", "credits" or "license" for more information.
+&gt;&gt;&gt; from wt.epm import EPMDocument
+&gt;&gt;&gt; 
+</code></pre>
+
+<p>For further improvement, I can now locally manage Java dependencies using
+<a href="http://pypi.python.org/pypi/jip" title="jip">jip</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[groovy: scripting PDMlink]]></title>
@@ -285,231 +498,6 @@ being able to <em>explore</em> live-objects sounded at least interesting to me.<
 <li>doing a side-by-side comparsion of <strong>jython</strong> and <strong>groovy</strong> code</li>
 </ul>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[experiments with groovy]]></title>
-    <link href="http://seletz.github.com/blog/2012/01/05/experiments-with-groovy/"/>
-    <updated>2012-01-05T17:30:00+01:00</updated>
-    <id>http://seletz.github.com/blog/2012/01/05/experiments-with-groovy</id>
-    <content type="html"><![CDATA[<p>In my constant task to hone and resharpen my tools, I've started some experiments
-with <strong>groovy</strong>.</p>
-
-<!-- more -->
-
-
-<p>Groovy is a scripting language which runs on top of the <em>JVM</em> like <em>Jython</em> or <em>jRuby</em>.  But
-unlike other scripting languages, <strong>groovy</strong> classes are full-blown Java classes and can be used
-within plain Java.  Also, any Java package can be used in groovy without writing bridges and
-stuff.</p>
-
-<p>Also it seems that <strong>groovy</strong> fits my python and coffee-script infested brain better than the more
-modern and hip cousins <strong>clojure</strong> and <strong>scala</strong>.</p>
-
-<p>So what does it look like?  Grok this:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>maps, adding and iterating over items (mapkeys.groovy)</span> <a href='/downloads/code/groovy/mapkeys.groovy'>download</a></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">def</span> <span class="n">map</span> <span class="o">=</span> <span class="o">[:]</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">map</span><span class="o">.</span><span class="na">some_key</span> <span class="o">=</span> <span class="s">&quot;value&quot;</span>
-</span><span class='line'><span class="n">map</span><span class="o">.</span><span class="na">another_key</span> <span class="o">=</span> <span class="s">&quot;foo&quot;</span>
-</span><span class='line'><span class="n">map</span><span class="o">[</span><span class="s">&quot;yet another key&quot;</span><span class="o">]</span> <span class="o">=</span> <span class="s">&quot;bar&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">map</span><span class="o">.</span><span class="na">each</span> <span class="o">{</span> <span class="n">item</span> <span class="o">-&gt;</span>
-</span><span class='line'>	<span class="n">println</span> <span class="s">&quot;$item.key =&gt; $item.value&quot;</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// implicit maps</span>
-</span><span class='line'><span class="n">def</span> <span class="n">errors</span> <span class="o">=</span> <span class="o">[</span> <span class="nl">EINVAL:</span> <span class="o">-</span><span class="mi">1</span><span class="o">,</span> <span class="nl">ENOSPC:</span> <span class="o">-</span><span class="mi">3</span><span class="o">,</span> <span class="nl">EPROTO:</span> <span class="o">-</span><span class="mi">42</span><span class="o">]</span> <span class="c1">// just some example</span>
-</span><span class='line'><span class="n">println</span> <span class="n">errors</span><span class="o">.</span><span class="na">EINVAL</span>  <span class="c1">// -1</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>(note: I did'nt succeed in getting the groovy lexer running in pygments and octopress, so
-no syntax coloring. oh well.)</p>
-
-<p>This looks pretty readable to me!</p>
-
-<h2>classes, closures, iterators -- oh my</h2>
-
-<p><strong>groovy</strong> is fully OO -- grok this:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>maps, adding and iterating over items (mapkeys.groovy)</span> <a href='/downloads/code/groovy/mapkeys.groovy'>download</a></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">def</span> <span class="n">map</span> <span class="o">=</span> <span class="o">[:]</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">map</span><span class="o">.</span><span class="na">some_key</span> <span class="o">=</span> <span class="s">&quot;value&quot;</span>
-</span><span class='line'><span class="n">map</span><span class="o">.</span><span class="na">another_key</span> <span class="o">=</span> <span class="s">&quot;foo&quot;</span>
-</span><span class='line'><span class="n">map</span><span class="o">[</span><span class="s">&quot;yet another key&quot;</span><span class="o">]</span> <span class="o">=</span> <span class="s">&quot;bar&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">map</span><span class="o">.</span><span class="na">each</span> <span class="o">{</span> <span class="n">item</span> <span class="o">-&gt;</span>
-</span><span class='line'>	<span class="n">println</span> <span class="s">&quot;$item.key =&gt; $item.value&quot;</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// implicit maps</span>
-</span><span class='line'><span class="n">def</span> <span class="n">errors</span> <span class="o">=</span> <span class="o">[</span> <span class="nl">EINVAL:</span> <span class="o">-</span><span class="mi">1</span><span class="o">,</span> <span class="nl">ENOSPC:</span> <span class="o">-</span><span class="mi">3</span><span class="o">,</span> <span class="nl">EPROTO:</span> <span class="o">-</span><span class="mi">42</span><span class="o">]</span> <span class="c1">// just some example</span>
-</span><span class='line'><span class="n">println</span> <span class="n">errors</span><span class="o">.</span><span class="na">EINVAL</span>  <span class="c1">// -1</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>The block enclosed in curly braces is a <em>closure</em>.  They're objects, too:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>fun with closures (closure.groovy)</span> <a href='/downloads/code/groovy/closure.groovy'>download</a></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="c1">// a closure</span>
-</span><span class='line'><span class="n">def</span> <span class="n">closure</span> <span class="o">=</span> <span class="o">{</span> <span class="n">a</span><span class="o">,</span> <span class="n">b</span> <span class="o">-&gt;</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span> <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// let&#39;s call it</span>
-</span><span class='line'><span class="n">println</span> <span class="n">closure</span><span class="o">.</span><span class="na">call</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="mi">2</span><span class="o">)</span>  <span class="c1">// 3</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// same, less verbose</span>
-</span><span class='line'><span class="n">println</span> <span class="nf">closure</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="mi">2</span><span class="o">)</span>  <span class="c1">// 3</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// we can also accept a closure as a parameter</span>
-</span><span class='line'><span class="n">def</span> <span class="nf">when</span><span class="o">(</span><span class="n">condition</span><span class="o">,</span> <span class="n">closure</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>	<span class="k">if</span> <span class="o">(</span><span class="n">condition</span><span class="o">)</span>
-</span><span class='line'>		<span class="n">closure</span><span class="o">()</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">when</span> <span class="o">(</span><span class="mi">4</span><span class="o">&lt;</span><span class="mi">5</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>	<span class="n">println</span> <span class="s">&quot;yay!&quot;</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">def</span> <span class="n">local</span> <span class="o">=</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">def</span> <span class="n">test</span> <span class="o">=</span> <span class="o">{</span> <span class="n">x</span> <span class="o">-&gt;</span> <span class="n">local</span> <span class="o">+</span> <span class="n">x</span> <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">println</span> <span class="s">&quot;test(2) =&gt; ${test(2)}&quot;</span> <span class="c1">// test(2) =&gt; 4</span>
-</span><span class='line'><span class="n">local</span> <span class="o">=</span> <span class="mi">3</span>
-</span><span class='line'><span class="n">println</span> <span class="s">&quot;test(2) =&gt; ${test(2)}&quot;</span> <span class="c1">// test(2) =&gt; 5</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">def</span> <span class="n">test2</span> <span class="o">=</span> <span class="o">{</span> <span class="n">x</span> <span class="o">-&gt;</span>
-</span><span class='line'>	<span class="n">def</span> <span class="n">local2</span> <span class="o">=</span> <span class="n">x</span>
-</span><span class='line'>	<span class="k">return</span> <span class="o">{</span> <span class="n">k</span> <span class="o">-&gt;</span> <span class="n">k</span> <span class="o">+</span> <span class="n">local2</span> <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">def</span> <span class="n">test_2</span> <span class="o">=</span> <span class="n">test2</span><span class="o">(</span><span class="mi">2</span><span class="o">)</span>
-</span><span class='line'><span class="n">def</span> <span class="n">test_3</span> <span class="o">=</span> <span class="n">test2</span><span class="o">(</span><span class="mi">3</span><span class="o">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">println</span> <span class="s">&quot;test_2(2) =&gt; ${test_2(2)}&quot;</span> <span class="c1">// test_2(2) =&gt; 4</span>
-</span><span class='line'><span class="n">println</span> <span class="s">&quot;test_3(2) =&gt; ${test_3(2)}&quot;</span> <span class="c1">// test_3(2) =&gt; 5</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Another nice thing is how classes are defined and how <strong>groovy</strong> creates automatic
-constructors:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>classes and constructors (class.groovy)</span> <a href='/downloads/code/groovy/class.groovy'>download</a></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="c1">// a simple class.   Note that we do not define a constructor.</span>
-</span><span class='line'><span class="kd">class</span> <span class="nc">Person</span> <span class="o">{</span>
-</span><span class='line'>	<span class="kd">public</span> <span class="n">String</span> <span class="n">name</span>
-</span><span class='line'>	<span class="kd">public</span> <span class="n">Integer</span> <span class="n">age</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">def</span> <span class="n">anonymous</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Person</span><span class="o">()</span>
-</span><span class='line'><span class="n">def</span> <span class="n">stefan</span>    <span class="o">=</span> <span class="k">new</span> <span class="n">Person</span><span class="o">(</span> <span class="nl">name:</span> <span class="s">&quot;Stefan&quot;</span><span class="o">,</span> <span class="nl">age:</span> <span class="mi">38</span><span class="o">)</span>
-</span><span class='line'><span class="n">def</span> <span class="n">fritz</span>     <span class="o">=</span> <span class="k">new</span> <span class="n">Person</span><span class="o">(</span> <span class="nl">name:</span> <span class="s">&quot;Fritz&quot;</span><span class="o">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">println</span> <span class="s">&quot;${stefan.name} is ${stefan.age} years old.&quot;</span> <span class="c1">// stefan is 38 years old.</span>
-</span><span class='line'><span class="n">println</span> <span class="s">&quot;${fritz.name} is ${fritz.age} years old.&quot;</span> <span class="c1">// fritz is null years old.</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">stefan</span><span class="o">.</span><span class="na">age</span> <span class="o">=</span> <span class="mi">35</span> <span class="c1">// no setters and getters needed!</span>
-</span><span class='line'><span class="n">println</span> <span class="s">&quot;${stefan.name} is ${stefan.age} years old.&quot;</span> <span class="c1">// stefan is 35 years old.</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// coerce a map to a class.  Will call named-arg automatic ctor</span>
-</span><span class='line'><span class="n">def</span> <span class="n">maja</span> <span class="o">=</span> <span class="o">[</span><span class="nl">name:</span><span class="s">&quot;Maja&quot;</span><span class="o">,</span> <span class="nl">age:</span><span class="mi">8</span><span class="o">]</span> <span class="n">as</span> <span class="n">Person</span>
-</span><span class='line'><span class="n">println</span> <span class="s">&quot;${maja.name} is ${maja.age} years old.&quot;</span> <span class="c1">// maja is 8 years old.</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Notice how we did <strong>not</strong> need to specify getter and setter methods.  Also notice
-how <strong>groovy</strong> uses named arguments!</p>
-
-<h2>What's next?</h2>
-
-<p>Well.  Next up, I'll try to get some <code>PDMlink</code> stuff working with <strong>groovy</strong>.</p>
-
-<h2>Links</h2>
-
-<p>You can find <strong>groovy</strong> documentation at <a href="http://groovy.codehaus.org/" title="Groovy at codehaus">codehaus</a>.  There's also a zone
-over at <a href="http://groovy.dzone.com/" title="Groovy Zone">dzone</a>.</p>
-
-<p>There's also a API documentation of the <a href="http://groovy.codehaus.org/api/overview-summary.html" title="Groovy JDK">groovy JDK</a>.</p>
 ]]></content>
   </entry>
   
