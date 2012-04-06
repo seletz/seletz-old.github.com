@@ -3,7 +3,7 @@ layout: post
 title: "groovy: scripting PDMlink"
 date: 2012-01-08 20:33
 comments: true
-categories: 
+categories: groovy java
 published: true
 ---
 

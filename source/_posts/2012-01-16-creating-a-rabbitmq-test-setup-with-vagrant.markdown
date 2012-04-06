@@ -27,7 +27,7 @@ add the `Vagrantfile` and all provisioning scriptzs there::
 
 The `Vagrantfile` looks like this::
 
-{% include_code [vagrant] [2]file ruby/Vagrantfile-rabbitmq lang:ruby %}
+{% include_code vagrant file ruby/Vagrantfile-rabbitmq lang:ruby %}
 
 The configuration sets the machines up, such that:
 
