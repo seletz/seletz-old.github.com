@@ -57,6 +57,9 @@ default_asides: [asides/recent_posts.html, custom/asides/coderwall.html, asides/
 #   3rd Party Settings    #
 # ----------------------- #
 
+# coderwall
+coderwall_user: seletz
+
 # Github repositories
 github_user: seletz
 github_repo_count: 0
