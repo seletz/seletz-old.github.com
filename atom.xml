@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://seletz.github.com/atom.xml" rel="self"/>
   <link href="http://seletz.github.com/"/>
-  <updated>2012-06-08T22:38:24+02:00</updated>
+  <updated>2012-07-09T11:08:59+02:00</updated>
   <id>http://seletz.github.com/</id>
   <author>
     <name><![CDATA[Stefan Eletzhofer]]></name>
@@ -12,6 +12,171 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Clojure for Windchill Development, Part 1]]></title>
+    <link href="http://seletz.github.com/blog/2012/07/09/clojure-windchill/"/>
+    <updated>2012-07-09T10:06:00+02:00</updated>
+    <id>http://seletz.github.com/blog/2012/07/09/clojure-windchill</id>
+    <content type="html"><![CDATA[<p>I always wanted to know more about functional programming and lisp &#8211; so I
+thought why not use <a href="http://clojure.org">Clojure</a>.  It runs on the <em>JVM</em> and I can try out some
+real-world problems with it.</p>
+
+<p>Normally I use <a href="http://jython.org">Jython</a> &#8211; a implementation of the <a href="http://python.org">Python</a> programming
+language which runs on the <em>JVM</em> &#8211; to develop for Windchill.</p>
+
+<p>This is the first part of a series of post&#8217;s I&#8217;m going to make to log my progress.</p>
+
+<p>In this part I&#8217;ll show how to <em>authenticate</em> and <em>search</em> in Windchill using Clojure.</p>
+
+<!-- more -->
+
+
+<h2>Installing</h2>
+
+<p>I use a mac, so installing Clojure is quite easy for me &#8211; YMMV::</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>    <span class="nv">$ </span>brew install clojure
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Running the Clojure REPL</h2>
+
+<p>That&#8217;s easy, too:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>clj
+</span><span class='line'>Clojure 1.4.0
+</span><span class='line'><span class="nv">user</span><span class="o">=</span>&gt; <span class="o">(</span>+ 1 2<span class="o">)</span>
+</span><span class='line'>3
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Installing Clojure in Windchill</h2>
+
+<p>This is quite easy, too.  Just drop the Clojure <em>jar</em> file to
+<code>$WT\_HOME/codebase/WEB-INF/lib</code>.  Then, when starting the <em>REPL</em>, be sure to
+have the <code>CLASSPATH</code> set up correctly.</p>
+
+<h2>First Steps using Windchill</h2>
+
+<p>The first Task I wanted to solve is:</p>
+
+<ul>
+<li>authenticate against Windchill using the <code>RemoteMethodServer</code></li>
+<li>search for a named <code>EPMDocument</code> using a custom-built <code>QuerySpec</code></li>
+</ul>
+
+
+<p>This is what I came up with:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="nb">import </span><span class="o">&#39;</span><span class="p">(</span><span class="nv">wt</span><span class="o">.</span><span class="nv">method</span> <span class="nv">RemoteMethodServer</span><span class="p">)</span>
+</span><span class='line'>        <span class="o">&#39;</span><span class="p">(</span><span class="nv">wt</span><span class="o">.</span><span class="nv">epm</span> <span class="nv">EPMDocument</span><span class="p">)</span>
+</span><span class='line'>        <span class="o">&#39;</span><span class="p">(</span><span class="nv">wt</span><span class="o">.</span><span class="nv">fc</span> <span class="nv">PersistenceHelper</span><span class="p">)</span>
+</span><span class='line'>        <span class="o">&#39;</span><span class="p">(</span><span class="nv">wt</span><span class="o">.</span><span class="nv">query</span> <span class="nv">QuerySpec</span> <span class="nv">SearchCondition</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">defn </span><span class="nv">authenticate</span> <span class="p">[</span><span class="nv">u</span> <span class="nv">p</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="nb">doto </span><span class="p">(</span><span class="o">.</span> <span class="nv">RemoteMethodServer</span> <span class="nv">getDefault</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">(</span><span class="o">.</span><span class="nv">setUserName</span> <span class="nv">u</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">(</span><span class="o">.</span><span class="nv">setPassword</span> <span class="nv">p</span><span class="p">)))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">defn </span><span class="nv">sc-name</span> <span class="p">[</span><span class="nv">name</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">SearchCondition</span><span class="o">.</span> <span class="nv">EPMDocument</span> <span class="p">(</span><span class="nf">EPMDocument/NAME</span><span class="p">)</span> <span class="s">&quot;LIKE&quot;</span> <span class="nv">name</span> <span class="nv">false</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">defn </span><span class="nv">make-query-spec</span> <span class="p">[</span><span class="nv">class</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">QuerySpec</span><span class="o">.</span> <span class="nv">class</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">defn </span><span class="nv">build-query-spec</span> <span class="p">[</span><span class="nv">name</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">qs</span> <span class="p">(</span><span class="nf">make-query-spec</span> <span class="nv">EPMDocument</span><span class="p">)]</span>
+</span><span class='line'>    <span class="p">(</span><span class="o">.</span><span class="nv">appendWhere</span> <span class="nv">qs</span> <span class="p">(</span><span class="nf">sc-name</span> <span class="nv">name</span><span class="p">))</span>
+</span><span class='line'>    <span class="nv">qs</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">defn </span><span class="nv">search</span> <span class="p">[</span><span class="nv">name</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">enumeration-seq</span>
+</span><span class='line'>    <span class="p">(</span><span class="o">.</span><span class="nv">find</span> <span class="nv">PersistenceHelper/manager</span>
+</span><span class='line'>      <span class="p">(</span><span class="nf">build-query-spec</span> <span class="nv">name</span><span class="p">))))</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; Authenticate first</span>
+</span><span class='line'><span class="p">(</span><span class="nf">authenticate</span> <span class="s">&quot;orgadmin&quot;</span> <span class="s">&quot;orgadmin&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; Do a search for `k05*.asm`</span>
+</span><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">result</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">search</span> <span class="s">&quot;k05%.asm&quot;</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; and print out all the resulting objects.</span>
+</span><span class='line'><span class="p">(</span><span class="nb">println </span><span class="nv">result</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The code is also on <a href="https://github.com/seletz/clojure-windchill">github</a>.</p>
+
+<h2>Things To Note</h2>
+
+<ul>
+<li><p>The first few lines (1..4) import Classes from the named packages to the
+current namespace.</p></li>
+<li><p>The <code>(doto instance expr)</code> special form saves quite some typing. (line 7)</p></li>
+<li><p>It took a while until I figured out how to convert the enumeration from the
+<code>QueryResult</code> to a Clojure sequence.  It&#8217;s the <code>(enumeration-seq expr)</code>
+special form.  This is quite cool, as this probably means that the results
+from the search would be processed lazily, too. (line 23)</p></li>
+<li><p>I had quite some problems getting the <code>(let [...] expr)</code> special form right.
+For some reason I had one pair of parens too much and it kept evaluating a
+<code>nil</code> result from Java which caused a dreaded <code>Null Pointer Exception</code>.</p></li>
+<li><p>I started to put the <code>(authenticate ...)</code> and the imports in a <code>user.clj</code>, such that the
+<em>REPL</em> has these aitomatically loaded.</p></li>
+</ul>
+
+
+<p>Things to explore:</p>
+
+<ul>
+<li><p>Use a custom name space.  Currently, all is in the <code>user</code> name space.</p></li>
+<li><p>Use <a href="https://github.com/technomancy/leiningen/">leiningen</a> to manage dependencies.</p></li>
+<li><p>Better <a href="http://posterous.adambard.com/quickstart-clojure-on-vim-lein-slimv-windows">VIM integration</a></p></li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Jython, classpath and virtualenv]]></title>
