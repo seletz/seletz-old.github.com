@@ -5,12 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>z3c.recipe.staticlxml moved to git - My Octopress Blog</title>
+  <title>Installing MacVIM with split browser support using homebrew - My Octopress Blog</title>
   <meta name="author" content="Stefan Eletzhofer">
 
   
-  <meta name="description" content="I&#8217;ve got a request to update my buildout recipe to build a statically
-linked lxml library, I decided to move the repository to GitHub. This way &hellip;">
+  <meta name="description" content="I&#8217;m a old-school coder and my first editor was vi on a old terminal
+hooked to some big-iron unix box. I never recovered &#8211; thus I&#8217;m &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +19,7 @@ linked lxml library, I decided to move the repository to GitHub. This way &helli
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://seletz.github.com/blog/2012/02/25/z3c-dot-recipe-dot-staticlxml-moved-to-git">
+  <link rel="canonical" href="http://seletz.github.com/blog/2012/09/01/macvim-split-browser">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -85,7 +85,7 @@ linked lxml library, I decided to move the repository to GitHub. This way &helli
   
   <header>
     
-      <h1 class="entry-title">z3c.recipe.staticlxml Moved to Git</h1>
+      <h1 class="entry-title">Installing MacVIM With Split Browser Support Using Homebrew</h1>
     
     
       <p class="meta">
@@ -101,7 +101,7 @@ linked lxml library, I decided to move the repository to GitHub. This way &helli
   
 
 
-<time datetime="2012-02-25T14:35:00+01:00" pubdate data-updated="true">2012-02-25</time>
+<time datetime="2012-09-01T00:00:00+02:00" pubdate data-updated="true">2012-09-01</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -110,111 +110,104 @@ linked lxml library, I decided to move the repository to GitHub. This way &helli
   </header>
 
 
-<div class="entry-content"><p>I&#8217;ve got a request to update my buildout recipe to build a statically
-linked lxml library, I decided to move the repository to GitHub.  This way,
-people can fork my code and submit pull requests.</p>
+<div class="entry-content"><p>I&#8217;m a old-school coder and my first editor was <em>vi</em> on a old terminal
+hooked to some big-iron unix box.  I never recovered &#8211; thus I&#8217;m still
+using a modal editor &#8211; <a href="http://macvim.org">MacVIM</a>.</p>
 
-<p>As I ran into some issues during the process I did a quick writeup.</p>
+<p>MacVIM is a <a href="http://vim.org">Vim</a> port for OSX with quite some extensions like multiple
+windows, editor tabs, nice font rendering etc.</p>
+
+<p>There&#8217;s also a experimental branch which adds a file-browser side pane, which is
+implemented in Objective-C and thus very fast.</p>
+
+<p><img class="center" src="http://dl.dropbox.com/u/154097/blog-images/macvim-split-browser.jpg" title="MacVIM split browser" alt="MacVIM split browser"></p>
+
+<p>Keeping up-to-date with this branch is tedious &#8211; cloning, pulling in new sources,
+compiling &#8230;</p>
+
+<p>Today I accidentally found the <a href="https://github.com/joelcogen/homebrew-macvimsplitbrowser">homebrew recipe</a> from Joel Cogen &#8211; and in his
+read-me a feature of homebrew which was new to me &#8211; <code>brew tap &lt;&lt;github repo name&gt;&gt;</code>.</p>
 
 <!-- more -->
 
 
-<h2>Moving to git</h2>
+<p>So you do a:</p>
 
-<p>First I cheked GitHub for a <a href="http://help.github.com/import-from-subversion" title="tutorial">tutorial</a> &#8211; I&#8217;m lazy.</p>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>brew tap joelcogen/macvimsplitbrowser
+</span><span class='line'>Cloning into <span class="s1">&#39;/usr/local/Library/Taps/joelcogen-macvimsplitbrowser&#39;</span>...
+</span><span class='line'>remote: Counting objects: 7, <span class="k">done</span>.
+</span><span class='line'>remote: Compressing objects: 100% <span class="o">(</span>6/6<span class="o">)</span>, <span class="k">done</span>.
+</span><span class='line'>remote: Total 7 <span class="o">(</span>delta 1<span class="o">)</span>, reused 7 <span class="o">(</span>delta 1<span class="o">)</span>
+</span><span class='line'>Unpacking objects: 100% <span class="o">(</span>7/7<span class="o">)</span>, <span class="k">done</span>.
+</span><span class='line'>Tapped 1 formula
+</span></code></pre></td></tr></table></div></figure>
 
-<p>Then I tried to launch <code>git-svn</code> in my shell, tried to install it, until
-I remembered that the actual command is <code>git svn</code>.  D&#8217;oh.</p>
 
-<p>Then I ran into this error when importing the SVN repo:</p>
+<p>And <a href="https://github.com/homebrew">homebrew</a> will happily clone the repository specified to <code>/usr/local/Library/Taps</code>.  This
+means that I&#8217;m now able to install MacVIM with split browser support using homebrew:</p>
 
-<pre><code>using existing [svn-remote "svn"]
-Using higher level of URL: svn+ssh://seletz@svn.zope.org/repos/main/z3c.recipe.staticlxml =&gt; svn+ssh://seletz@svn.zope.org/repos/main
-W: Ignoring error from SVN, path probably does not exist: (160013): Filesystem has no item: File not found: revision 100, path '/z3c.recipe.staticlxml'
-W: Do not be alarmed at the above message git-svn is just searching aggressively for old history.
-This may take a while on large repositories
-r93394 = b27bb31b8e3f9048d7fbf639ebd89e6b33f47f36 (refs/remotes/trunk)
-    A   bootstrap.py
-    A   buildout.cfg
-    A   CHANGES.txt
-    A   setup.py
-    A   src/z3c/__init__.py
-    A   src/z3c/recipe/staticlxml/tests/__init__.py
-    A   src/z3c/recipe/staticlxml/tests/test_docs.py
-    A   src/z3c/recipe/staticlxml/__init__.py
-    A   src/z3c/recipe/staticlxml/README.txt
-    A   src/z3c/recipe/__init__.py
-    A   CONTRIBUTORS.txt
-    A   README.txt
-W: +empty_dir: z3c.recipe.staticlxml/trunk/downloads
-r93395 = 6898a232ff85dbfd6aff4e4f9dc959fe3b9fd443 (refs/remotes/trunk)
-    M   buildout.cfg
-    M   CHANGES.txt
-    M   src/z3c/recipe/staticlxml/__init__.py
-    M   src/z3c/recipe/staticlxml/README.txt
-r93396 = 40feb0aa5f65476cf6fa7b8722e164660dd0c4e2 (refs/remotes/trunk)
-    M   buildout.cfg
-    M   CHANGES.txt
-    M   src/z3c/recipe/staticlxml/__init__.py
-r93397 = 1155246997d81732cdcb466c0b692edcd260d231 (refs/remotes/trunk)
-    M   CHANGES.txt]
-    M   setup.py
-r93400 = 32375fd9ab8024c0f8b8ed0f40a3dad27a520a25 (refs/remotes/trunk)
-Found possible branch point: svn+ssh://seletz@svn.zope.org/repos/main/z3c.recipe.staticlxml/trunk =&gt; svn+ssh://seletz@svn.zope.org/repos/main/z3c.recipe.staticlxml/branches/0.1, 93401
-Use of uninitialized value $u in substitution (s///) at /usr/local/Cellar/git/1.7.9.1/libexec/git-core/git-svn line 2097.
-Use of uninitialized value $u in concatenation (.) or string at /usr/local/Cellar/git/1.7.9.1/libexec/git-core/git-svn line 2097.
-refs/remotes/svn/tags/0.1: 'svn+ssh://svn.zope.org/repos/main' not found in ''
-</code></pre>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>brew install macvim-split-browser
+</span><span class='line'><span class="o">==</span>&gt; Downloading https://github.com/alloy/macvim/tarball/1167a32988202c3c81842371ecf9f80fe4854172
+</span><span class='line'><span class="c">######################################################################## 100,0%</span>
+</span><span class='line'><span class="o">==</span>&gt; ./configure --with-features<span class="o">=</span>huge --with-tlib<span class="o">=</span>ncurses --enable-multibyte --with-macarchs<span class="o">=</span>x86_64 --e
+</span><span class='line'><span class="o">==</span>&gt; <span class="nb">cd </span>src/MacVim/icons <span class="o">&amp;&amp;</span> make <span class="nv">getenvy</span>
+</span><span class='line'><span class="o">==</span>&gt; <span class="nv">make</span>
+</span><span class='line'><span class="o">==</span>&gt; Caveats
+</span><span class='line'>This formula will most probably conflict with the macvim formula.
+</span><span class='line'>If you already installed MacVim from Homebrew, please remove it using:
+</span><span class='line'>    brew uninstall macvim
+</span><span class='line'>
+</span><span class='line'>MacVim.app installed to:
+</span><span class='line'>  /usr/local/Cellar/macvim-split-browser/20120109
+</span><span class='line'>
+</span><span class='line'>To link the application to a normal Mac OS X location:
+</span><span class='line'>    brew linkapps
+</span><span class='line'>or:
+</span><span class='line'>    ln -s /usr/local/Cellar/macvim-split-browser/20120109/MacVim.app /Applications
+</span><span class='line'><span class="o">==</span>&gt; Summary
+</span><span class='line'>/usr/local/Cellar/macvim-split-browser/20120109: 1730 files, 26M, built in 48 seconds
+</span></code></pre></td></tr></table></div></figure>
 
-<p>Google reveals that this seems to be a git <a href="http://help.github.com/import-from-subversion" title="issue">issue</a>.</p>
 
-<p>So, I updated to <code>git 1.7.9.2</code>, but still the same error.  More googling, and some perl hacking
-I ended up with this diff:</p>
+<p>Installing links in <code>~/Applications</code> is done as usual:</p>
 
-<pre><code>--- /usr/local/Cellar/git/1.7.9.2/libexec/git-core/git-svn.orig 2012-02-25 14:52:46.000000000 +0100
-+++ /usr/local/Cellar/git/1.7.9.2/libexec/git-core/git-svn  2012-02-25 14:53:46.000000000 +0100
-@@ -2094,8 +2094,12 @@
-                    " globbed: $refname\n";
-            }
-            my $u = (::cmt_metadata("$refname"))[0];
--           $u =~ s!^\Q$url\E(/|$)!! or die
--             "$refname: '$url' not found in '$u'\n";
-+           if (!$u) {
-+               $u = $pathname;
-+           } else {
-+               $u =~ s!^\Q$url\E(/|$)!! or die
-+                 "$refname: '$url' not found in '$u'\n";
-+           }
-            if ($pathname ne $u) {
-                warn "W: Refspec glob conflict ",
-                     "(ref: $refname):\n",
-</code></pre>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>osx/macvim <span class="o">[</span> brew linkapps                                                   split-browser <span class="o">]</span> 12:25 pm
+</span><span class='line'>Linking /usr/local/Cellar/macvim-split-browser/20120109/MacVim.app
+</span><span class='line'>Finished linking. Find the links under ~/Applications.
+</span></code></pre></td></tr></table></div></figure>
 
-<p>This seems to do the trick.</p>
 
-<h2>Actual Commandline To Do The Conversion</h2>
 
-<p>After hacking around the issues I got, the actual process is simple:</p>
-
-<pre><code>$ mkdir z3c.recipe.staticlxml.git
-$ cd z3c.recipe.staticlxml.git
-$ sudo gem install svn2git
-$ svn2git --verbose svn+ssh://seletz@svn.zope.org/repos/main/z3c.recipe.staticlxml
-</code></pre>
-
-<p>Then simply add the new remote and push:</p>
-
-<pre><code>$ git remote add origin git@github.com:seletz/z3c.recipe.staticlxml.git
-$ git push origin master
-</code></pre>
-
-<p>Now create a development branch:</p>
-
-<pre><code>$ git co -b develop
-$ git push origin develop
-</code></pre>
-
-<p>Now I&#8217;m ready to hack on this project.</p>
 </div>
 
 
@@ -237,12 +230,12 @@ $ git push origin develop
   
 
 
-<time datetime="2012-02-25T14:35:00+01:00" pubdate data-updated="true">2012-02-25</time>
+<time datetime="2012-09-01T00:00:00+02:00" pubdate data-updated="true">2012-09-01</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/python/'>python</a>, <a class='category' href='/blog/categories/tools/'>tools</a>
+    <a class='category' href='/blog/categories/howto/'>howto</a>, <a class='category' href='/blog/categories/tools/'>tools</a>
   
 </span>
 
@@ -251,7 +244,7 @@ $ git push origin develop
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://seletz.github.com/blog/2012/02/25/z3c-dot-recipe-dot-staticlxml-moved-to-git/" data-via="seletz" data-counturl="http://seletz.github.com/blog/2012/02/25/z3c-dot-recipe-dot-staticlxml-moved-to-git/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://seletz.github.com/blog/2012/09/01/macvim-split-browser/" data-via="seletz" data-counturl="http://seletz.github.com/blog/2012/09/01/macvim-split-browser/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -264,10 +257,8 @@ $ git push origin develop
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2012/01/18/creating-a-rabbitmq-test-setup-with-vagrant/" title="Previous Post: Creating a RabbitMQ test setup with vagrant">&laquo; Creating a RabbitMQ test setup with vagrant</a>
+        <a class="basic-alignment left" href="/blog/2012/07/09/clojure-windchill/" title="Previous Post: Clojure for Windchill Development, Part 1">&laquo; Clojure for Windchill Development, Part 1</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2012/02/28/jython-oracle-jdbc/" title="next Post: Jython, Oracle and JDBC">Jython, Oracle and JDBC &raquo;</a>
       
     </p>
   </footer>
@@ -397,8 +388,8 @@ $ git push origin develop
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://seletz.github.com/blog/2012/02/25/z3c-dot-recipe-dot-staticlxml-moved-to-git/';
-        var disqus_url = 'http://seletz.github.com/blog/2012/02/25/z3c-dot-recipe-dot-staticlxml-moved-to-git/';
+        var disqus_identifier = 'http://seletz.github.com/blog/2012/09/01/macvim-split-browser/';
+        var disqus_url = 'http://seletz.github.com/blog/2012/09/01/macvim-split-browser/';
         var disqus_script = 'embed.js';
       
     (function () {

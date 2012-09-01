@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://seletz.github.com/atom.xml" rel="self"/>
   <link href="http://seletz.github.com/"/>
-  <updated>2012-07-09T11:08:59+02:00</updated>
+  <updated>2012-09-01T13:34:56+02:00</updated>
   <id>http://seletz.github.com/</id>
   <author>
     <name><![CDATA[Stefan Eletzhofer]]></name>
@@ -12,6 +12,112 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Installing MacVIM with split browser support using homebrew]]></title>
+    <link href="http://seletz.github.com/blog/2012/09/01/macvim-split-browser/"/>
+    <updated>2012-09-01T00:00:00+02:00</updated>
+    <id>http://seletz.github.com/blog/2012/09/01/macvim-split-browser</id>
+    <content type="html"><![CDATA[<p>I&#8217;m a old-school coder and my first editor was <em>vi</em> on a old terminal
+hooked to some big-iron unix box.  I never recovered &#8211; thus I&#8217;m still
+using a modal editor &#8211; <a href="http://macvim.org">MacVIM</a>.</p>
+
+<p>MacVIM is a <a href="http://vim.org">Vim</a> port for OSX with quite some extensions like multiple
+windows, editor tabs, nice font rendering etc.</p>
+
+<p>There&#8217;s also a experimental branch which adds a file-browser side pane, which is
+implemented in Objective-C and thus very fast.</p>
+
+<p><img class="center" src="http://dl.dropbox.com/u/154097/blog-images/macvim-split-browser.jpg" title="MacVIM split browser" alt="MacVIM split browser"></p>
+
+<p>Keeping up-to-date with this branch is tedious &#8211; cloning, pulling in new sources,
+compiling &#8230;</p>
+
+<p>Today I accidentally found the <a href="https://github.com/joelcogen/homebrew-macvimsplitbrowser">homebrew recipe</a> from Joel Cogen &#8211; and in his
+read-me a feature of homebrew which was new to me &#8211; <code>brew tap &lt;&lt;github repo name&gt;&gt;</code>.</p>
+
+<!-- more -->
+
+
+<p>So you do a:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>brew tap joelcogen/macvimsplitbrowser
+</span><span class='line'>Cloning into <span class="s1">&#39;/usr/local/Library/Taps/joelcogen-macvimsplitbrowser&#39;</span>...
+</span><span class='line'>remote: Counting objects: 7, <span class="k">done</span>.
+</span><span class='line'>remote: Compressing objects: 100% <span class="o">(</span>6/6<span class="o">)</span>, <span class="k">done</span>.
+</span><span class='line'>remote: Total 7 <span class="o">(</span>delta 1<span class="o">)</span>, reused 7 <span class="o">(</span>delta 1<span class="o">)</span>
+</span><span class='line'>Unpacking objects: 100% <span class="o">(</span>7/7<span class="o">)</span>, <span class="k">done</span>.
+</span><span class='line'>Tapped 1 formula
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And <a href="https://github.com/homebrew">homebrew</a> will happily clone the repository specified to <code>/usr/local/Library/Taps</code>.  This
+means that I&#8217;m now able to install MacVIM with split browser support using homebrew:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>brew install macvim-split-browser
+</span><span class='line'><span class="o">==</span>&gt; Downloading https://github.com/alloy/macvim/tarball/1167a32988202c3c81842371ecf9f80fe4854172
+</span><span class='line'><span class="c">######################################################################## 100,0%</span>
+</span><span class='line'><span class="o">==</span>&gt; ./configure --with-features<span class="o">=</span>huge --with-tlib<span class="o">=</span>ncurses --enable-multibyte --with-macarchs<span class="o">=</span>x86_64 --e
+</span><span class='line'><span class="o">==</span>&gt; <span class="nb">cd </span>src/MacVim/icons <span class="o">&amp;&amp;</span> make <span class="nv">getenvy</span>
+</span><span class='line'><span class="o">==</span>&gt; <span class="nv">make</span>
+</span><span class='line'><span class="o">==</span>&gt; Caveats
+</span><span class='line'>This formula will most probably conflict with the macvim formula.
+</span><span class='line'>If you already installed MacVim from Homebrew, please remove it using:
+</span><span class='line'>    brew uninstall macvim
+</span><span class='line'>
+</span><span class='line'>MacVim.app installed to:
+</span><span class='line'>  /usr/local/Cellar/macvim-split-browser/20120109
+</span><span class='line'>
+</span><span class='line'>To link the application to a normal Mac OS X location:
+</span><span class='line'>    brew linkapps
+</span><span class='line'>or:
+</span><span class='line'>    ln -s /usr/local/Cellar/macvim-split-browser/20120109/MacVim.app /Applications
+</span><span class='line'><span class="o">==</span>&gt; Summary
+</span><span class='line'>/usr/local/Cellar/macvim-split-browser/20120109: 1730 files, 26M, built in 48 seconds
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Installing links in <code>~/Applications</code> is done as usual:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>osx/macvim <span class="o">[</span> brew linkapps                                                   split-browser <span class="o">]</span> 12:25 pm
+</span><span class='line'>Linking /usr/local/Cellar/macvim-split-browser/20120109/MacVim.app
+</span><span class='line'>Finished linking. Find the links under ~/Applications.
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Clojure for Windchill Development, Part 1]]></title>

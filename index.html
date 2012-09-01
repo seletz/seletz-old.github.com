@@ -9,8 +9,8 @@
   <meta name="author" content="Stefan Eletzhofer">
 
   
-  <meta name="description" content="I always wanted to know more about functional programming and lisp &#8211; so I
-thought why not use Clojure. It runs on the JVM and I can try out &hellip;">
+  <meta name="description" content="I&#8217;m a old-school coder and my first editor was vi on a old terminal
+hooked to some big-iron unix box. I never recovered &#8211; thus I&#8217;m &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -82,6 +82,65 @@ thought why not use Clojure. It runs on the JVM and I can try out &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/09/01/macvim-split-browser/">Installing MacVIM With Split Browser Support Using Homebrew</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-01T00:00:00+02:00" pubdate data-updated="true">2012-09-01</time>
+        
+         | <a href="/blog/2012/09/01/macvim-split-browser/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I&#8217;m a old-school coder and my first editor was <em>vi</em> on a old terminal
+hooked to some big-iron unix box.  I never recovered &#8211; thus I&#8217;m still
+using a modal editor &#8211; <a href="http://macvim.org">MacVIM</a>.</p>
+
+<p>MacVIM is a <a href="http://vim.org">Vim</a> port for OSX with quite some extensions like multiple
+windows, editor tabs, nice font rendering etc.</p>
+
+<p>There&#8217;s also a experimental branch which adds a file-browser side pane, which is
+implemented in Objective-C and thus very fast.</p>
+
+<p><img class="center" src="http://dl.dropbox.com/u/154097/blog-images/macvim-split-browser.jpg" title="MacVIM split browser" alt="MacVIM split browser"></p>
+
+<p>Keeping up-to-date with this branch is tedious &#8211; cloning, pulling in new sources,
+compiling &#8230;</p>
+
+<p>Today I accidentally found the <a href="https://github.com/joelcogen/homebrew-macvimsplitbrowser">homebrew recipe</a> from Joel Cogen &#8211; and in his
+read-me a feature of homebrew which was new to me &#8211; <code>brew tap &lt;&lt;github repo name&gt;&gt;</code>.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/09/01/macvim-split-browser/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -511,6 +570,10 @@ with <strong>groovy</strong>.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/09/01/macvim-split-browser/">Installing MacVIM with split browser support using homebrew</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/07/09/clojure-windchill/">Clojure for Windchill Development, Part 1</a>
       </li>
     
@@ -524,10 +587,6 @@ with <strong>groovy</strong>.</p>
     
       <li class="post">
         <a href="/blog/2012/02/25/z3c-dot-recipe-dot-staticlxml-moved-to-git/">z3c.recipe.staticlxml moved to git</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/18/creating-a-rabbitmq-test-setup-with-vagrant/">Creating a RabbitMQ test setup with vagrant</a>
       </li>
     
   </ul>
@@ -554,23 +613,6 @@ with <strong>groovy</strong>.</p>
     </script>
     <script src="http://coderwall.com/seletz.json?callback=display_coderwall"></script>
   </p>
-  
-</section>
-
-
-<section>
-  <h1>Latest Tweets</h1>
-  <ul id="tweets">
-    <li class="loading">Status updating&#8230;</li>
-  </ul>
-  <script type="text/javascript">
-    $.domReady(function(){
-      getTwitterFeed("seletz", 4, true);
-    });
-  </script>
-  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
-  
-    <a href="http://twitter.com/seletz" class="twitter-follow-button" data-show-count="false">Follow @seletz</a>
   
 </section>
 
@@ -657,10 +699,13 @@ with <strong>groovy</strong>.</p>
 
 
 
-<!-- Place this tag where you want the badge to render -->
-<a href="https://plus.google.com/106477632016330375313?prsrc=3" rel="author" style="text-decoration:none;">
-    <img src="https://ssl.gstatic.com/images/icons/gplus-32.png" alt="" style="border:0;width:32px;height:32px;"/>
-</a>
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
 
 
 
