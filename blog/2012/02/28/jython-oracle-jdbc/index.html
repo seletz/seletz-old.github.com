@@ -1,0 +1,636 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Jython, Oracle and JDBC - My Octopress Blog</title>
+  <meta name="author" content="Stefan Eletzhofer">
+
+  
+  <meta name="description" content="I recently had the need to access a new table in an existing oracle database
+using Jython. I needed to atomically increase a field in for one row. &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://seletz.github.com/blog/2012/02/28/jython-oracle-jdbc">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.cm/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://coderwall.com/stylesheets/jquery.coderwall.css" media="all" rel="stylesheet" type="text/css">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://coderwall.com/javascripts/jquery.coderwall.js"></script>
+
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-28179328-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">My Octopress Blog</a></h1>
+  
+    <h2>I'm no longer young but I still need the money.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:seletz.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Jython, Oracle and JDBC</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-28T08:21:00+01:00" pubdate data-updated="true">2012-02-28</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>I recently had the need to access a new table in an existing oracle database
+using Jython.  I needed to atomically increase a field in for <strong>one</strong> row.</p>
+
+<p>Here is what I came up with.</p>
+
+<!-- more -->
+
+
+<h2>Notes</h2>
+
+<ul>
+<li><p>The demo code relies on a existing table &#8216;NXTEST&#8217; in oracle.  I used navicat lite
+to create this table.</p></li>
+<li><p>The demo code locks a table row using &#8216;select &#8230; for update&#8217; to atomically increase
+the SEQ column.</p></li>
+<li><p>The requirement was that I could have a huge number of <code>name</code> entries,
+all slightly different, each needing a separate counter.  I did&#8217;nt want
+to create a <code>sequence</code> for each of them.</p></li>
+</ul>
+
+
+<h2>Gotchas</h2>
+
+<ul>
+<li><p>Apparently oracle <em>needs</em> upper cased table and column names.</p></li>
+<li><p>I could not get oci connections to work.  This seems to be a <a href="https://forums.oracle.com/forums/thread.jspa?threadID=1080064" title="bug in 10.2">bug in 10.2</a></p></li>
+<li><p>Because of a bug in Jython 2.5.2 wrt <code>__import__</code> I could not get
+SQLAlchemy to work.</p></li>
+</ul>
+
+
+<figure class='code'><figcaption><span>jython-oracle-jdbs.py (jdbc-oracle.py)</span> <a href='/downloads/code/python/jdbc-oracle.py'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">with_statement</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">logging</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">com.ziclix.python.sql</span> <span class="kn">import</span> <span class="n">zxJDBC</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&quot;nexiles.wt.demo&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">setup_logging</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+</span><span class='line'>    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&quot;</span><span class="si">%(asctime)s</span><span class="s"> [</span><span class="si">%(levelname)-7s</span><span class="s">] [line </span><span class="si">%(lineno)d</span><span class="s">] </span><span class="si">%(name)s</span><span class="s">: </span><span class="si">%(message)s</span><span class="s">&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">get_connection</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+</span><span class='line'>    <span class="n">jdbc_url</span> <span class="o">=</span> <span class="s">&quot;jdbc:oracle:thin:@</span><span class="si">%(host)s</span><span class="s">:</span><span class="si">%(port)s</span><span class="s">:</span><span class="si">%(sid)s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">locals</span><span class="p">()</span>
+</span><span class='line'>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;get_connection: jdbc_url=</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">jdbc_url</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">driver</span> <span class="o">=</span> <span class="s">&quot;oracle.jdbc.driver.OracleDriver&quot;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">zxJDBC</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">jdbc_url</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">driver</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">update_sequence</span><span class="p">(</span><span class="n">cursor</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+</span><span class='line'>    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select NAME, SEQ from NXTEST where name = ? for update&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">name</span><span class="p">])</span>
+</span><span class='line'>    <span class="n">result</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+</span><span class='line'>    <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+</span><span class='line'>        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;UPDATE: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;update NXTEST set seq = seq + 1 where name = ?&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">name</span><span class="p">])</span>
+</span><span class='line'>    <span class="k">else</span><span class="p">:</span>
+</span><span class='line'>        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;CREATE: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;insert into NXTEST values (?, ?)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">name</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select NAME, SEQ from NXTEST where name = ?&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">name</span><span class="p">])</span>
+</span><span class='line'>    <span class="n">result</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+</span><span class='line'>    <span class="n">_</span><span class="p">,</span> <span class="n">seq</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span class='line'>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;NAME: </span><span class="si">%s</span><span class="s"> =&gt; SEQ </span><span class="si">%03d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">seq</span><span class="p">))</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">seq</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+</span><span class='line'>    <span class="n">username</span> <span class="o">=</span> <span class="s">&quot;****&quot;</span>
+</span><span class='line'>    <span class="n">password</span> <span class="o">=</span> <span class="s">&quot;****&quot;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">with</span> <span class="n">get_connection</span><span class="p">(</span><span class="s">&quot;example.com&quot;</span><span class="p">,</span> <span class="mi">1521</span><span class="p">,</span> <span class="s">&quot;orc4&quot;</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+</span><span class='line'>        <span class="k">with</span> <span class="n">conn</span><span class="p">:</span>
+</span><span class='line'>            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;connection: </span><span class="si">%r</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">conn</span><span class="p">)</span>
+</span><span class='line'>            <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">c</span><span class="p">:</span>
+</span><span class='line'>                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;cursor: </span><span class="si">%r</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">c</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="n">update_sequence</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s">&quot;test-foo-bar&quot;</span><span class="p">)</span>
+</span><span class='line'>                <span class="n">update_sequence</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s">&quot;test-foo-bar&quot;</span><span class="p">)</span>
+</span><span class='line'>                <span class="n">update_sequence</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s">&quot;test-bar-bar&quot;</span><span class="p">)</span>
+</span><span class='line'>                <span class="n">update_sequence</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s">&quot;test-bar-bar&quot;</span><span class="p">)</span>
+</span><span class='line'>                <span class="n">update_sequence</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s">&quot;flirz-foo-bar&quot;</span><span class="p">)</span>
+</span><span class='line'>                <span class="n">update_sequence</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s">&quot;flirz-foo-bar&quot;</span><span class="p">)</span>
+</span><span class='line'>                <span class="n">update_sequence</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s">&quot;flirz-foo-bar&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+</span><span class='line'>    <span class="n">setup_logging</span><span class="p">()</span>
+</span><span class='line'>    <span class="n">main</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Edit</h2>
+
+<p>I retested <code>SQLAlchemy</code> using the recently <a href="http://downloads.sourceforge.net/project/jython/jython-dev/2.5.3b1/jython_installer-2.5.3b1.jar" title="released">released</a> <code>Jython-2.5.3b1</code>, and
+this version indeed fixes the <code>__import__</code> bug.</p>
+
+<p>Here&#8217;s the <code>homebrew</code> recipe for it:</p>
+
+<figure class='code'><figcaption><span>jython (jython.rb)</span> <a href='/downloads/code/ruby/jython.rb'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;formula&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">Jython</span> <span class="o">&lt;</span> <span class="no">Formula</span>
+</span><span class='line'>  <span class="n">homepage</span> <span class="s1">&#39;http://www.jython.org&#39;</span>
+</span><span class='line'>  <span class="n">url</span> <span class="s2">&quot;http://downloads.sourceforge.net/project/jython/jython-dev/2.5.3b1/jython_installer-2.5.3b1.jar&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="ss">:using</span> <span class="o">=&gt;</span> <span class="ss">:nounzip</span>
+</span><span class='line'>  <span class="n">sha1</span> <span class="s1">&#39;bcfc024a93289b2f99bf000fb7666a48fe3d32da&#39;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">install</span>
+</span><span class='line'>    <span class="nb">system</span> <span class="s2">&quot;java&quot;</span><span class="p">,</span> <span class="s2">&quot;-jar&quot;</span><span class="p">,</span> <span class="s2">&quot;jython_installer-2.5.3b1.jar&quot;</span><span class="p">,</span> <span class="s2">&quot;-s&quot;</span><span class="p">,</span> <span class="s2">&quot;-d&quot;</span><span class="p">,</span> <span class="n">libexec</span>
+</span><span class='line'>    <span class="n">bin</span><span class="o">.</span><span class="n">install_symlink</span> <span class="n">libexec</span><span class="o">+</span><span class="s1">&#39;bin/jython&#39;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>FWIW, this shows how to connect to Oracle using <code>SQLAlchemy</code> and Jython.
+Thoe code below does <strong>not</strong> do the same thing as the one above (as in
+atomic increases of the SEQ column), however.</p>
+
+<figure class='code'><figcaption><span>jython-oracle-jdbs.py (jdbc-oracle-sqlalchemy.py)</span> <a href='/downloads/code/python/jdbc-oracle-sqlalchemy.py'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">sessionmaker</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Sequence</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Table</span><span class="p">,</span> <span class="n">Column</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">MetaData</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">mapper</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">url</span> <span class="o">=</span> <span class="s">&quot;oracle+zxjdbc://user:pass@example.com:1521/orc4&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">echo</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">metadata</span> <span class="o">=</span> <span class="n">MetaData</span><span class="p">()</span>
+</span><span class='line'><span class="n">fooversions_table</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="s">&#39;FooVersions&#39;</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span>
+</span><span class='line'>        <span class="n">Column</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">(</span><span class="s">&#39;foo_version_id_seq&#39;</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+</span><span class='line'>        <span class="n">Column</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">)),</span>
+</span><span class='line'>        <span class="n">Column</span><span class="p">(</span><span class="s">&#39;seq&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">FooVersions</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">seq</span><span class="p">):</span>
+</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">seq</span> <span class="o">=</span> <span class="n">seq</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class='line'>        <span class="k">return</span> <span class="s">&quot;&lt;FooVersions(&#39;</span><span class="si">%s</span><span class="s">&#39;,&#39;</span><span class="si">%s</span><span class="s">&#39;)&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">m</span> <span class="o">=</span> <span class="n">mapper</span><span class="p">(</span><span class="n">FooVersions</span><span class="p">,</span> <span class="n">fooversions_table</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Create Session class and bind it to the database</span>
+</span><span class='line'><span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+</span><span class='line'><span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">FooVersions</span><span class="p">(</span><span class="s">&quot;context-foo-abc&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">)</span>
+</span><span class='line'><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">FooVersions</span><span class="p">(</span><span class="s">&quot;context-foo-def&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">)</span>
+</span><span class='line'><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">FooVersions</span><span class="p">(</span><span class="s">&quot;context-foo-ghi&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Still, I see the following advantages using <code>SQLAlchemy</code> (other than having
+a pretty darn nifty ORM):</p>
+
+<ul>
+<li><p>Class Mappers.  I like these.</p></li>
+<li><p><code>SQLAlchemy</code> hides all the magic Oracle stuff (Sequences, upper cased table
+names)</p></li>
+<li><p>Minor but handy: Optionally <code>SQLAlchemy</code> logs every SQL statement.</p></li>
+</ul>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Stefan Eletzhofer</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-28T08:21:00+01:00" pubdate data-updated="true">2012-02-28</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/howto/'>howto</a>, <a class='category' href='/blog/categories/jython/'>jython</a>, <a class='category' href='/blog/categories/python/'>python</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://seletz.github.com/blog/2012/02/28/jython-oracle-jdbc/" data-via="seletz" data-counturl="http://seletz.github.com/blog/2012/02/28/jython-oracle-jdbc/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/02/25/z3c-dot-recipe-dot-staticlxml-moved-to-git/" title="Previous Post: z3c.recipe.staticlxml moved to git">&laquo; z3c.recipe.staticlxml moved to git</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/04/06/jython-classpath-virtualenv/" title="next Post: Jython, classpath and virtualenv">Jython, classpath and virtualenv &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/07/09/clojure-windchill/">Clojure for Windchill Development, Part 1</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/04/06/jython-classpath-virtualenv/">Jython, classpath and virtualenv</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/02/28/jython-oracle-jdbc/">Jython, Oracle and JDBC</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/02/25/z3c-dot-recipe-dot-staticlxml-moved-to-git/">z3c.recipe.staticlxml moved to git</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/01/18/creating-a-rabbitmq-test-setup-with-vagrant/">Creating a RabbitMQ test setup with vagrant</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Coderwall Badges</h1>
+  <p>
+    <script type="text/javascript">
+      function display_coderwall(args) {
+        var badges = args["data"]["badges"];
+        var wall = '';
+        for ( var i = 0; i < badges.length; i++ ) {
+          var alt_txt = badges[i]["name"];
+          var title_txt = badges[i]["name"] + ' - ' + badges[i]["description"];
+          wall += '<a href="http://coderwall.com/seletz/"><img src="'
+            + badges[i]["badge"]
+            + '" width="48" height="48" alt="' + alt_txt
+            + '" title="' + title_txt
+            + '"/></a>';
+        }
+        document.write(wall);
+      }
+    </script>
+    <script src="http://coderwall.com/seletz.json?callback=display_coderwall"></script>
+  </p>
+  
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("seletz", 4, true);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/seletz" class="twitter-follow-button" data-show-count="false">Follow @seletz</a>
+  
+</section>
+
+
+<section>
+  <h1>Github Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/seletz">@seletz</a> on Github
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'seletz',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/106477632016330375313?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 &mdash; Stefan Eletzhofer &mdash;
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span> &mdash;
+  <span class="credit"><a href="/imprint">impressum</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'seletz';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://seletz.github.com/blog/2012/02/28/jython-oracle-jdbc/';
+        var disqus_url = 'http://seletz.github.com/blog/2012/02/28/jython-oracle-jdbc/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+<!-- Place this tag where you want the badge to render -->
+<a href="https://plus.google.com/106477632016330375313?prsrc=3" rel="author" style="text-decoration:none;">
+    <img src="https://ssl.gstatic.com/images/icons/gplus-32.png" alt="" style="border:0;width:32px;height:32px;"/>
+</a>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

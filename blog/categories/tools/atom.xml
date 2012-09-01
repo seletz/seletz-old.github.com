@@ -4,7 +4,7 @@
   <title><![CDATA[Category: tools | My Octopress Blog]]></title>
   <link href="http://seletz.github.com/blog/categories/tools/atom.xml" rel="self"/>
   <link href="http://seletz.github.com/"/>
-  <updated>2012-02-15T09:17:05+01:00</updated>
+  <updated>2012-07-09T11:08:59+02:00</updated>
   <id>http://seletz.github.com/</id>
   <author>
     <name><![CDATA[Stefan Eletzhofer]]></name>
@@ -12,6 +12,343 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[z3c.recipe.staticlxml moved to git]]></title>
+    <link href="http://seletz.github.com/blog/2012/02/25/z3c-dot-recipe-dot-staticlxml-moved-to-git/"/>
+    <updated>2012-02-25T14:35:00+01:00</updated>
+    <id>http://seletz.github.com/blog/2012/02/25/z3c-dot-recipe-dot-staticlxml-moved-to-git</id>
+    <content type="html"><![CDATA[<p>I've got a request to update my buildout recipe to build a statically
+linked lxml library, I decided to move the repository to GitHub.  This way,
+people can fork my code and submit pull requests.</p>
+
+<p>As I ran into some issues during the process I did a quick writeup.</p>
+
+<!-- more -->
+
+
+<h2>Moving to git</h2>
+
+<p>First I cheked GitHub for a <a href="http://help.github.com/import-from-subversion" title="tutorial">tutorial</a> -- I'm lazy.</p>
+
+<p>Then I tried to launch <code>git-svn</code> in my shell, tried to install it, until
+I remembered that the actual command is <code>git svn</code>.  D'oh.</p>
+
+<p>Then I ran into this error when importing the SVN repo:</p>
+
+<pre><code>using existing [svn-remote "svn"]
+Using higher level of URL: svn+ssh://seletz@svn.zope.org/repos/main/z3c.recipe.staticlxml =&gt; svn+ssh://seletz@svn.zope.org/repos/main
+W: Ignoring error from SVN, path probably does not exist: (160013): Filesystem has no item: File not found: revision 100, path '/z3c.recipe.staticlxml'
+W: Do not be alarmed at the above message git-svn is just searching aggressively for old history.
+This may take a while on large repositories
+r93394 = b27bb31b8e3f9048d7fbf639ebd89e6b33f47f36 (refs/remotes/trunk)
+    A   bootstrap.py
+    A   buildout.cfg
+    A   CHANGES.txt
+    A   setup.py
+    A   src/z3c/__init__.py
+    A   src/z3c/recipe/staticlxml/tests/__init__.py
+    A   src/z3c/recipe/staticlxml/tests/test_docs.py
+    A   src/z3c/recipe/staticlxml/__init__.py
+    A   src/z3c/recipe/staticlxml/README.txt
+    A   src/z3c/recipe/__init__.py
+    A   CONTRIBUTORS.txt
+    A   README.txt
+W: +empty_dir: z3c.recipe.staticlxml/trunk/downloads
+r93395 = 6898a232ff85dbfd6aff4e4f9dc959fe3b9fd443 (refs/remotes/trunk)
+    M   buildout.cfg
+    M   CHANGES.txt
+    M   src/z3c/recipe/staticlxml/__init__.py
+    M   src/z3c/recipe/staticlxml/README.txt
+r93396 = 40feb0aa5f65476cf6fa7b8722e164660dd0c4e2 (refs/remotes/trunk)
+    M   buildout.cfg
+    M   CHANGES.txt
+    M   src/z3c/recipe/staticlxml/__init__.py
+r93397 = 1155246997d81732cdcb466c0b692edcd260d231 (refs/remotes/trunk)
+    M   CHANGES.txt]
+    M   setup.py
+r93400 = 32375fd9ab8024c0f8b8ed0f40a3dad27a520a25 (refs/remotes/trunk)
+Found possible branch point: svn+ssh://seletz@svn.zope.org/repos/main/z3c.recipe.staticlxml/trunk =&gt; svn+ssh://seletz@svn.zope.org/repos/main/z3c.recipe.staticlxml/branches/0.1, 93401
+Use of uninitialized value $u in substitution (s///) at /usr/local/Cellar/git/1.7.9.1/libexec/git-core/git-svn line 2097.
+Use of uninitialized value $u in concatenation (.) or string at /usr/local/Cellar/git/1.7.9.1/libexec/git-core/git-svn line 2097.
+refs/remotes/svn/tags/0.1: 'svn+ssh://svn.zope.org/repos/main' not found in ''
+</code></pre>
+
+<p>Google reveals that this seems to be a git <a href="http://help.github.com/import-from-subversion" title="issue">issue</a>.</p>
+
+<p>So, I updated to <code>git 1.7.9.2</code>, but still the same error.  More googling, and some perl hacking
+I ended up with this diff:</p>
+
+<pre><code>--- /usr/local/Cellar/git/1.7.9.2/libexec/git-core/git-svn.orig 2012-02-25 14:52:46.000000000 +0100
++++ /usr/local/Cellar/git/1.7.9.2/libexec/git-core/git-svn  2012-02-25 14:53:46.000000000 +0100
+@@ -2094,8 +2094,12 @@
+                    " globbed: $refname\n";
+            }
+            my $u = (::cmt_metadata("$refname"))[0];
+-           $u =~ s!^\Q$url\E(/|$)!! or die
+-             "$refname: '$url' not found in '$u'\n";
++           if (!$u) {
++               $u = $pathname;
++           } else {
++               $u =~ s!^\Q$url\E(/|$)!! or die
++                 "$refname: '$url' not found in '$u'\n";
++           }
+            if ($pathname ne $u) {
+                warn "W: Refspec glob conflict ",
+                     "(ref: $refname):\n",
+</code></pre>
+
+<p>This seems to do the trick.</p>
+
+<h2>Actual Commandline To Do The Conversion</h2>
+
+<p>After hacking around the issues I got, the actual process is simple:</p>
+
+<pre><code>$ mkdir z3c.recipe.staticlxml.git
+$ cd z3c.recipe.staticlxml.git
+$ sudo gem install svn2git
+$ svn2git --verbose svn+ssh://seletz@svn.zope.org/repos/main/z3c.recipe.staticlxml
+</code></pre>
+
+<p>Then simply add the new remote and push:</p>
+
+<pre><code>$ git remote add origin git@github.com:seletz/z3c.recipe.staticlxml.git
+$ git push origin master
+</code></pre>
+
+<p>Now create a development branch:</p>
+
+<pre><code>$ git co -b develop
+$ git push origin develop
+</code></pre>
+
+<p>Now I'm ready to hack on this project.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Creating a RabbitMQ test setup with vagrant]]></title>
+    <link href="http://seletz.github.com/blog/2012/01/18/creating-a-rabbitmq-test-setup-with-vagrant/"/>
+    <updated>2012-01-18T16:00:00+01:00</updated>
+    <id>http://seletz.github.com/blog/2012/01/18/creating-a-rabbitmq-test-setup-with-vagrant</id>
+    <content type="html"><![CDATA[<p>In this post I'll provide a writeup on how I created a test setup for
+a project I'm working on.  The project uses <a href="http://www.rabbitmq.com/" title="RabbitMQ">RabbitMQ</a> to distribute
+tasks to a worker, and the production system is a cluster of Apache/Tomcat
+machines.</p>
+
+<p>I'll use <a href="http://vagrantup.com/" title="vagrant">vagrant</a> to create two test machines, one which runs <a href="http://www.rabbitmq.com/" title="RabbitMQ">RabbitMQ</a>, the other
+one will run the actual worker code.</p>
+
+<!-- more -->
+
+
+<h2>Preparation</h2>
+
+<p>I'll have the <a href="http://vagrantup.com/" title="vagrant">vagrant</a> files in a subdirectory <code>vagrant</code> in my git repository.  I'll
+add the <code>Vagrantfile</code> and all provisioning scriptzs there::</p>
+
+<pre><code>$ mkdir vagrant
+</code></pre>
+
+<p>The <code>Vagrantfile</code> looks like this::</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>vagrant file (Vagrantfile-rabbitmq)</span> <a href='/downloads/code/ruby/Vagrantfile-rabbitmq'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># -*- mode: ruby -*-</span>
+</span><span class='line'><span class="c1"># vi: set ft=ruby ts=2 sw=2 expandtab:</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Vagrant</span><span class="o">::</span><span class="no">Config</span><span class="o">.</span><span class="n">run</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">box</span> <span class="o">=</span> <span class="s2">&quot;ubuntu-natty-64&quot;</span>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">define</span> <span class="ss">:rabbitmq</span> <span class="k">do</span> <span class="o">|</span><span class="n">rabbit_config</span><span class="o">|</span>
+</span><span class='line'>    <span class="c1">#rabbit_config.vm.boot_mode = :gui</span>
+</span><span class='line'>    <span class="n">rabbit_config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">box</span>
+</span><span class='line'>    <span class="n">rabbit_config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">network</span><span class="p">(</span><span class="s2">&quot;192.168.64.10&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">rabbit_config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">provision</span> <span class="ss">:shell</span><span class="p">,</span> <span class="ss">:path</span> <span class="o">=&gt;</span> <span class="s2">&quot;rabbitmq.sh&quot;</span>
+</span><span class='line'>    <span class="n">rabbit_config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">customize</span> <span class="k">do</span> <span class="o">|</span><span class="n">vm</span><span class="o">|</span>
+</span><span class='line'>      <span class="n">vm</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;nexiles - rabbitmq&quot;</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">define</span> <span class="ss">:worker</span> <span class="k">do</span> <span class="o">|</span><span class="n">worker_config</span><span class="o">|</span>
+</span><span class='line'>    <span class="n">worker_config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">box</span>
+</span><span class='line'>    <span class="c1">#worker_config.vm.boot_mode = :gui</span>
+</span><span class='line'>    <span class="n">worker_config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">network</span><span class="p">(</span><span class="s2">&quot;192.168.64.20&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">worker_config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">provision</span> <span class="ss">:shell</span><span class="p">,</span> <span class="ss">:path</span> <span class="o">=&gt;</span> <span class="s2">&quot;worker.sh&quot;</span>
+</span><span class='line'>    <span class="n">worker_config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">share_folder</span><span class="p">(</span><span class="s2">&quot;src&quot;</span><span class="p">,</span> <span class="s2">&quot;/src&quot;</span><span class="p">,</span> <span class="s2">&quot;~/develop/nexiles/worker/src&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">worker_config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">customize</span> <span class="k">do</span> <span class="o">|</span><span class="n">vm</span><span class="o">|</span>
+</span><span class='line'>      <span class="n">vm</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;nexiles - worker&quot;</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The configuration sets the machines up, such that:</p>
+
+<ul>
+<li>both have a IP to talk to eachother</li>
+<li>on the rabbitmq machine I've used the shell provisioner to install
+<a href="http://www.rabbitmq.com/" title="RabbitMQ">RabbitMQ</a> 2.7.1</li>
+<li>on the worker machine I've used the shell provisioner to create a python
+development environment in /opt</li>
+<li>share my source folder on the worker</li>
+</ul>
+
+
+<p>Note: For some reason I wanted to have all the <a href="http://vagrantup.com/" title="vagrant">vagrant</a> stuff in a separate directory.  I
+<strong>could</strong> have put the Vagrantfile in the top-level directory and thus saved me the additional
+shared folder.  Oh well.</p>
+
+<p>Here are the provisioning shell scripts::</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>rabbitmq.sh (vagrant-rabbitmq.sh)</span> <a href='/downloads/code/shell/vagrant-rabbitmq.sh'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cat &gt;&gt; /etc/apt/sources.list <span class="s">&lt;&lt;EOT</span>
+</span><span class='line'><span class="s">deb http://www.rabbitmq.com/debian/ testing main</span>
+</span><span class='line'><span class="s">EOT</span>
+</span><span class='line'>
+</span><span class='line'>wget http://www.rabbitmq.com/rabbitmq-signing-key-public.asc
+</span><span class='line'>apt-key add rabbitmq-signing-key-public.asc
+</span><span class='line'>
+</span><span class='line'>apt-get update
+</span><span class='line'>
+</span><span class='line'>apt-get install -q -y screen htop vim curl wget
+</span><span class='line'>apt-get install -q -y rabbitmq-server
+</span><span class='line'>
+</span><span class='line'><span class="c"># RabbitMQ Plugins</span>
+</span><span class='line'>service rabbitmq-server stop
+</span><span class='line'>rabbitmq-plugins <span class="nb">enable </span>rabbitmq_management
+</span><span class='line'>rabbitmq-plugins <span class="nb">enable </span>rabbitmq_jsonrpc
+</span><span class='line'>service rabbitmq-server start
+</span><span class='line'>
+</span><span class='line'>rabbitmq-plugins list
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="c">#wget http://www.rabbitmq.com/releases/rabbitmq-server/v2.7.1/rabbitmq-server_2.7.1-1_all.deb</span>
+</span><span class='line'><span class="c">#dpkg install rabbitmq-server_2.7.1-1_all.deb</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>worker.sh (vagrant-worker.sh)</span> <a href='/downloads/code/shell/vagrant-worker.sh'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">export </span><span class="nv">NX_HOME</span><span class="o">=</span>/opt/nexiles
+</span><span class='line'>
+</span><span class='line'>apt-get install -q -y screen htop curl wget vim
+</span><span class='line'>
+</span><span class='line'>mkdir -p <span class="nv">$NX_HOME</span>/<span class="o">{</span>bin,downloads<span class="o">}</span>
+</span><span class='line'>cat &gt; /etc/profile.d/nexiles.sh <span class="s">&lt;&lt; EOT</span>
+</span><span class='line'><span class="s">export NX_HOME=$NX_HOME</span>
+</span><span class='line'><span class="s">test -f &quot;\$NX_HOME/env.sh&quot; &amp;&amp; source \$NX_HOME/env.sh</span>
+</span><span class='line'><span class="s">EOT</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># python environment</span>
+</span><span class='line'>apt-get install -q -y python2.6
+</span><span class='line'><span class="nb">cd</span> <span class="nv">$NX_HOME</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">PYTHON</span><span class="o">=</span>/usr/bin/python2.6
+</span><span class='line'><span class="nb">export </span><span class="nv">PIP</span><span class="o">=</span>/usr/local/bin/pip
+</span><span class='line'>curl -s http://peak.telecommunity.com/dist/ez_setup.py &gt; <span class="nv">$NX_HOME</span>/downloads/ez_setup.py
+</span><span class='line'><span class="nv">$PYTHON</span> downloads/ez_setup.py -U
+</span><span class='line'>
+</span><span class='line'>easy_install-2.6 pip
+</span><span class='line'><span class="nv">$PIP</span> install virtualenv
+</span><span class='line'>
+</span><span class='line'>virtualenv -p /usr/bin/python2.6 --clear <span class="nv">$NX_HOME</span>
+</span><span class='line'>
+</span><span class='line'>. <span class="nv">$NX_HOME</span>/bin/activate
+</span><span class='line'>pip install requests
+</span><span class='line'>pip install <span class="nv">kombu</span><span class="o">==</span>1.5.1
+</span><span class='line'>
+</span><span class='line'><span class="c"># fix permissions</span>
+</span><span class='line'>chown -R vagrant <span class="nv">$NX_HOME</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<h2>Usage</h2>
+
+<p>To use the system I now just need to do a::</p>
+
+<pre><code>$ vagrant up
+</code></pre>
+
+<p>And I'm set.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Creating Vagrant Base Boxes With veewee]]></title>
@@ -24,8 +361,6 @@ create a <a href="http://www.vagrantup.com" title="vagrant">vagrant</a> setup.</
 
 <!-- more -->
 
-
-<blockquote></blockquote>
 
 <h2>Installing to a ruby rvm gemset</h2>
 
@@ -782,8 +1117,11 @@ I found a nice little setup on <em>github</em>: <a href="https://github.com/robb
 <pre><code>$ brew install zsh
 $ cd $HOME
 $ git clone https://github.com/robbyrussell/oh-my-zsh.git .oh-my-zsh
-$ sudo chsh -s zsh yourusernamehere
+$ sudo chsh -s /usr/local/bin/zsh yourusernamehere
 </code></pre>
+
+<p><strong>NOTE:</strong>
+  You may need to edit <code>/etc/shells</code> to have <code>/usr/local/bin/zsh</code>.</p>
 
 <h2>Configuration</h2>
 

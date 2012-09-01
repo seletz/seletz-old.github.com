@@ -9,9 +9,8 @@
   <meta name="author" content="Stefan Eletzhofer">
 
   
-  <meta name="description" content="In this post I show how to install and use veewee to create a new
-base box for vagrant. Then I&#8217;ll show how to use this new base box to
-create a &hellip;">
+  <meta name="description" content="I always wanted to know more about functional programming and lisp &#8211; so I
+thought why not use Clojure. It runs on the JVM and I can try out &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -30,7 +29,10 @@ create a &hellip;">
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.cm/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<script type="text/javascript" src="http://js.sopablackout.org/sopablackout.js"></script>
+<link href="http://coderwall.com/stylesheets/jquery.coderwall.css" media="all" rel="stylesheet" type="text/css">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://coderwall.com/javascripts/jquery.coderwall.js"></script>
+
 
   
   <script type="text/javascript">
@@ -80,6 +82,245 @@ create a &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/07/09/clojure-windchill/">Clojure for Windchill Development, Part 1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-09T10:06:00+02:00" pubdate data-updated="true">2012-07-09</time>
+        
+         | <a href="/blog/2012/07/09/clojure-windchill/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I always wanted to know more about functional programming and lisp &#8211; so I
+thought why not use <a href="http://clojure.org">Clojure</a>.  It runs on the <em>JVM</em> and I can try out some
+real-world problems with it.</p>
+
+<p>Normally I use <a href="http://jython.org">Jython</a> &#8211; a implementation of the <a href="http://python.org">Python</a> programming
+language which runs on the <em>JVM</em> &#8211; to develop for Windchill.</p>
+
+<p>This is the first part of a series of post&#8217;s I&#8217;m going to make to log my progress.</p>
+
+<p>In this part I&#8217;ll show how to <em>authenticate</em> and <em>search</em> in Windchill using Clojure.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/07/09/clojure-windchill/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/04/06/jython-classpath-virtualenv/">Jython, Classpath and Virtualenv</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-04-06T18:26:00+02:00" pubdate data-updated="true">2012-04-06</time>
+        
+         | <a href="/blog/2012/04/06/jython-classpath-virtualenv/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I finally came around to investigate some long standing issues I have
+had with my Jython development environment, namely setting up the
+<strong>CLASSPATH</strong>.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/04/06/jython-classpath-virtualenv/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/02/28/jython-oracle-jdbc/">Jython, Oracle and JDBC</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-28T08:21:00+01:00" pubdate data-updated="true">2012-02-28</time>
+        
+         | <a href="/blog/2012/02/28/jython-oracle-jdbc/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I recently had the need to access a new table in an existing oracle database
+using Jython.  I needed to atomically increase a field in for <strong>one</strong> row.</p>
+
+<p>Here is what I came up with.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/02/28/jython-oracle-jdbc/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/02/25/z3c-dot-recipe-dot-staticlxml-moved-to-git/">z3c.recipe.staticlxml Moved to Git</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-25T14:35:00+01:00" pubdate data-updated="true">2012-02-25</time>
+        
+         | <a href="/blog/2012/02/25/z3c-dot-recipe-dot-staticlxml-moved-to-git/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I&#8217;ve got a request to update my buildout recipe to build a statically
+linked lxml library, I decided to move the repository to GitHub.  This way,
+people can fork my code and submit pull requests.</p>
+
+<p>As I ran into some issues during the process I did a quick writeup.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/02/25/z3c-dot-recipe-dot-staticlxml-moved-to-git/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/01/18/creating-a-rabbitmq-test-setup-with-vagrant/">Creating a RabbitMQ Test Setup With Vagrant</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-01-18T16:00:00+01:00" pubdate data-updated="true">2012-01-18</time>
+        
+         | <a href="/blog/2012/01/18/creating-a-rabbitmq-test-setup-with-vagrant/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>In this post I&#8217;ll provide a writeup on how I created a test setup for
+a project I&#8217;m working on.  The project uses <a href="http://www.rabbitmq.com/" title="RabbitMQ">RabbitMQ</a> to distribute
+tasks to a worker, and the production system is a cluster of Apache/Tomcat
+machines.</p>
+
+<p>I&#8217;ll use <a href="http://vagrantup.com/" title="vagrant">vagrant</a> to create two test machines, one which runs <a href="http://www.rabbitmq.com/" title="RabbitMQ">RabbitMQ</a>, the other
+one will run the actual worker code.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/01/18/creating-a-rabbitmq-test-setup-with-vagrant/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -270,23 +511,52 @@ with <strong>groovy</strong>.</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2012/01/17/creating-vagrant-base-boxes-with-veewee/">Creating Vagrant Base Boxes With veewee</a>
+        <a href="/blog/2012/07/09/clojure-windchill/">Clojure for Windchill Development, Part 1</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2012/01/08/groovy-scripting-pdmlink/">groovy: scripting PDMlink</a>
+        <a href="/blog/2012/04/06/jython-classpath-virtualenv/">Jython, classpath and virtualenv</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2012/01/06/switch-from-bash-to-zsh/">switch from bash to zsh</a>
+        <a href="/blog/2012/02/28/jython-oracle-jdbc/">Jython, Oracle and JDBC</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2012/01/05/experiments-with-groovy/">experiments with groovy</a>
+        <a href="/blog/2012/02/25/z3c-dot-recipe-dot-staticlxml-moved-to-git/">z3c.recipe.staticlxml moved to git</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/01/18/creating-a-rabbitmq-test-setup-with-vagrant/">Creating a RabbitMQ test setup with vagrant</a>
       </li>
     
   </ul>
 </section>
+
+<section>
+  <h1>Coderwall Badges</h1>
+  <p>
+    <script type="text/javascript">
+      function display_coderwall(args) {
+        var badges = args["data"]["badges"];
+        var wall = '';
+        for ( var i = 0; i < badges.length; i++ ) {
+          var alt_txt = badges[i]["name"];
+          var title_txt = badges[i]["name"] + ' - ' + badges[i]["description"];
+          wall += '<a href="http://coderwall.com/seletz/"><img src="'
+            + badges[i]["badge"]
+            + '" width="48" height="48" alt="' + alt_txt
+            + '" title="' + title_txt
+            + '"/></a>';
+        }
+        document.write(wall);
+      }
+    </script>
+    <script src="http://coderwall.com/seletz.json?callback=display_coderwall"></script>
+  </p>
+  
+</section>
+
 
 <section>
   <h1>Latest Tweets</h1>
@@ -387,13 +657,10 @@ with <strong>groovy</strong>.</p>
 
 
 
-  <script type="text/javascript">
-    (function() {
-      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
-      script.src = 'https://apis.google.com/js/plusone.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
-    })();
-  </script>
+<!-- Place this tag where you want the badge to render -->
+<a href="https://plus.google.com/106477632016330375313?prsrc=3" rel="author" style="text-decoration:none;">
+    <img src="https://ssl.gstatic.com/images/icons/gplus-32.png" alt="" style="border:0;width:32px;height:32px;"/>
+</a>
 
 
 

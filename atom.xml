@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://seletz.github.com/atom.xml" rel="self"/>
   <link href="http://seletz.github.com/"/>
-  <updated>2012-02-15T09:17:05+01:00</updated>
+  <updated>2012-07-09T11:08:59+02:00</updated>
   <id>http://seletz.github.com/</id>
   <author>
     <name><![CDATA[Stefan Eletzhofer]]></name>
@@ -12,6 +12,1013 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Clojure for Windchill Development, Part 1]]></title>
+    <link href="http://seletz.github.com/blog/2012/07/09/clojure-windchill/"/>
+    <updated>2012-07-09T10:06:00+02:00</updated>
+    <id>http://seletz.github.com/blog/2012/07/09/clojure-windchill</id>
+    <content type="html"><![CDATA[<p>I always wanted to know more about functional programming and lisp &#8211; so I
+thought why not use <a href="http://clojure.org">Clojure</a>.  It runs on the <em>JVM</em> and I can try out some
+real-world problems with it.</p>
+
+<p>Normally I use <a href="http://jython.org">Jython</a> &#8211; a implementation of the <a href="http://python.org">Python</a> programming
+language which runs on the <em>JVM</em> &#8211; to develop for Windchill.</p>
+
+<p>This is the first part of a series of post&#8217;s I&#8217;m going to make to log my progress.</p>
+
+<p>In this part I&#8217;ll show how to <em>authenticate</em> and <em>search</em> in Windchill using Clojure.</p>
+
+<!-- more -->
+
+
+<h2>Installing</h2>
+
+<p>I use a mac, so installing Clojure is quite easy for me &#8211; YMMV::</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>    <span class="nv">$ </span>brew install clojure
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Running the Clojure REPL</h2>
+
+<p>That&#8217;s easy, too:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>clj
+</span><span class='line'>Clojure 1.4.0
+</span><span class='line'><span class="nv">user</span><span class="o">=</span>&gt; <span class="o">(</span>+ 1 2<span class="o">)</span>
+</span><span class='line'>3
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Installing Clojure in Windchill</h2>
+
+<p>This is quite easy, too.  Just drop the Clojure <em>jar</em> file to
+<code>$WT\_HOME/codebase/WEB-INF/lib</code>.  Then, when starting the <em>REPL</em>, be sure to
+have the <code>CLASSPATH</code> set up correctly.</p>
+
+<h2>First Steps using Windchill</h2>
+
+<p>The first Task I wanted to solve is:</p>
+
+<ul>
+<li>authenticate against Windchill using the <code>RemoteMethodServer</code></li>
+<li>search for a named <code>EPMDocument</code> using a custom-built <code>QuerySpec</code></li>
+</ul>
+
+
+<p>This is what I came up with:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="nb">import </span><span class="o">&#39;</span><span class="p">(</span><span class="nv">wt</span><span class="o">.</span><span class="nv">method</span> <span class="nv">RemoteMethodServer</span><span class="p">)</span>
+</span><span class='line'>        <span class="o">&#39;</span><span class="p">(</span><span class="nv">wt</span><span class="o">.</span><span class="nv">epm</span> <span class="nv">EPMDocument</span><span class="p">)</span>
+</span><span class='line'>        <span class="o">&#39;</span><span class="p">(</span><span class="nv">wt</span><span class="o">.</span><span class="nv">fc</span> <span class="nv">PersistenceHelper</span><span class="p">)</span>
+</span><span class='line'>        <span class="o">&#39;</span><span class="p">(</span><span class="nv">wt</span><span class="o">.</span><span class="nv">query</span> <span class="nv">QuerySpec</span> <span class="nv">SearchCondition</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">defn </span><span class="nv">authenticate</span> <span class="p">[</span><span class="nv">u</span> <span class="nv">p</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="nb">doto </span><span class="p">(</span><span class="o">.</span> <span class="nv">RemoteMethodServer</span> <span class="nv">getDefault</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">(</span><span class="o">.</span><span class="nv">setUserName</span> <span class="nv">u</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">(</span><span class="o">.</span><span class="nv">setPassword</span> <span class="nv">p</span><span class="p">)))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">defn </span><span class="nv">sc-name</span> <span class="p">[</span><span class="nv">name</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">SearchCondition</span><span class="o">.</span> <span class="nv">EPMDocument</span> <span class="p">(</span><span class="nf">EPMDocument/NAME</span><span class="p">)</span> <span class="s">&quot;LIKE&quot;</span> <span class="nv">name</span> <span class="nv">false</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">defn </span><span class="nv">make-query-spec</span> <span class="p">[</span><span class="nv">class</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">QuerySpec</span><span class="o">.</span> <span class="nv">class</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">defn </span><span class="nv">build-query-spec</span> <span class="p">[</span><span class="nv">name</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">qs</span> <span class="p">(</span><span class="nf">make-query-spec</span> <span class="nv">EPMDocument</span><span class="p">)]</span>
+</span><span class='line'>    <span class="p">(</span><span class="o">.</span><span class="nv">appendWhere</span> <span class="nv">qs</span> <span class="p">(</span><span class="nf">sc-name</span> <span class="nv">name</span><span class="p">))</span>
+</span><span class='line'>    <span class="nv">qs</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">defn </span><span class="nv">search</span> <span class="p">[</span><span class="nv">name</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">enumeration-seq</span>
+</span><span class='line'>    <span class="p">(</span><span class="o">.</span><span class="nv">find</span> <span class="nv">PersistenceHelper/manager</span>
+</span><span class='line'>      <span class="p">(</span><span class="nf">build-query-spec</span> <span class="nv">name</span><span class="p">))))</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; Authenticate first</span>
+</span><span class='line'><span class="p">(</span><span class="nf">authenticate</span> <span class="s">&quot;orgadmin&quot;</span> <span class="s">&quot;orgadmin&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; Do a search for `k05*.asm`</span>
+</span><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">result</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">search</span> <span class="s">&quot;k05%.asm&quot;</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; and print out all the resulting objects.</span>
+</span><span class='line'><span class="p">(</span><span class="nb">println </span><span class="nv">result</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The code is also on <a href="https://github.com/seletz/clojure-windchill">github</a>.</p>
+
+<h2>Things To Note</h2>
+
+<ul>
+<li><p>The first few lines (1..4) import Classes from the named packages to the
+current namespace.</p></li>
+<li><p>The <code>(doto instance expr)</code> special form saves quite some typing. (line 7)</p></li>
+<li><p>It took a while until I figured out how to convert the enumeration from the
+<code>QueryResult</code> to a Clojure sequence.  It&#8217;s the <code>(enumeration-seq expr)</code>
+special form.  This is quite cool, as this probably means that the results
+from the search would be processed lazily, too. (line 23)</p></li>
+<li><p>I had quite some problems getting the <code>(let [...] expr)</code> special form right.
+For some reason I had one pair of parens too much and it kept evaluating a
+<code>nil</code> result from Java which caused a dreaded <code>Null Pointer Exception</code>.</p></li>
+<li><p>I started to put the <code>(authenticate ...)</code> and the imports in a <code>user.clj</code>, such that the
+<em>REPL</em> has these aitomatically loaded.</p></li>
+</ul>
+
+
+<p>Things to explore:</p>
+
+<ul>
+<li><p>Use a custom name space.  Currently, all is in the <code>user</code> name space.</p></li>
+<li><p>Use <a href="https://github.com/technomancy/leiningen/">leiningen</a> to manage dependencies.</p></li>
+<li><p>Better <a href="http://posterous.adambard.com/quickstart-clojure-on-vim-lein-slimv-windows">VIM integration</a></p></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Jython, classpath and virtualenv]]></title>
+    <link href="http://seletz.github.com/blog/2012/04/06/jython-classpath-virtualenv/"/>
+    <updated>2012-04-06T18:26:00+02:00</updated>
+    <id>http://seletz.github.com/blog/2012/04/06/jython-classpath-virtualenv</id>
+    <content type="html"><![CDATA[<p>I finally came around to investigate some long standing issues I have
+had with my Jython development environment, namely setting up the
+<strong>CLASSPATH</strong>.</p>
+
+<!-- more -->
+
+
+<h2>Background</h2>
+
+<p>I use <em>Jython</em> every day to develop customizations and tools for a big,
+enterprise class PLM System.  Working with this system involves setting up and
+running Virtual Machines which run a stripped-down installation of the <a href="http://www.ptc.com/product/windchill/pdmlink" title="PLM">PLM</a>
+System configured for a specific customer.</p>
+
+<p>I&#8217;ve set up some shared folders and some terminal sessions such that I can
+code using my development tools I know and love (Python, VIM and the
+Terminal).</p>
+
+<p>To be able to test code I develop, I want the code to run <strong>on my local
+machine</strong>, that is, I do <strong>not</strong> want to click-test inside the VM, restart
+tomcat and whatnot.  I just want to fire up the python REPL and get going, I
+want to insert some PDB breakpoints and develop in an agile fashion.  Test
+Driven, even.</p>
+
+<h2>The Problem</h2>
+
+<p>Up until recently, found that I needed to set up the <strong>CLASSPATH</strong> using a
+environment variable for all the coding sessions I did.  I created some
+wrapper scripts which deduced the correct <strong>CLASSPATH</strong> based on the currently
+running VM, the customer project and some further guessing.</p>
+
+<p>This always felt clumsy, but worked, for the most part.</p>
+
+<p>At the same time, I missed the goodness of <em>virtualenv</em>, which I used to love,
+which yelled to me something like:</p>
+
+<pre><code>$ virtualenv -p jython foo                                                                                                                                                                ] 6:43 pm
+Running virtualenv with interpreter /usr/local/bin/jython
+New jython executable in foo/bin/jython
+ERROR: The executable foo/bin/jython is not functioning
+ERROR: It thinks sys.prefix is u'/usr/local/Cellar/jython/2.5.3b1/libexec' (should be u'/Users/seletz/develop/tmp/foo')
+ERROR: virtualenv is not compatible with this system or executable
+</code></pre>
+
+<h2>Solution</h2>
+
+<p>Now I need to confess.  I recently started looking at some IDE, because I came
+across the need to code some Java for a customer project.  It seems to me,
+that coding Java w/o a IDE is a hardcore PITA, thus, is started to look at
+<em>NetBeans</em>, <em>Eclipse</em> and <em>IntelliJ</em> (stuff for another post).</p>
+
+<p>While testing testing IDEs I also tried to set them up for Python and Jython
+development.  Whatever, I found that I can have a isolated Jython environment
+using <em>virtualenv</em> and w/o manually setting the <strong>CLASSPATH</strong>.</p>
+
+<p>The error <em>virtualenv</em> gave me is simply due to the fact that I have
+<strong>JYTHON_HOME</strong> set up in my default &#8230; WTF <a href="https://github.com/pypa/virtualenv/issues/185" title="issue">issue</a>?</p>
+
+<p>So, I just need to:</p>
+
+<pre><code>$ cd develop/tmp
+$ unset JYTHON_HOME
+$ virtualenv -p jython customer_1
+</code></pre>
+
+<p>And &#8211; lo and behold &#8211; we have a isolated Jython environment for
+<em>customer_1</em>, just like it should be.</p>
+
+<p>Poking further, I noticed that the <em>Jython registry</em> is also local, and, so
+is the &#8216;site-packages&#8217; directory.  Google found a <a href="http://stackoverflow.com/questions/5839300/defining-a-classpath-for-a-jython-virtual-environment" title="post">post</a> about setting up
+the Jython <em>CLASSPATH</em>, and thus I created a &#8216;windchill.pth&#8217; file in the
+&#8216;site-packages&#8217; directory:</p>
+
+<figure class='code'><figcaption><span>windchill.pth (windchill.pth)</span> <a href='http://seletz.github.com/downloads/code/jython/windchill.pth'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>/Volumes/wt-vm-ptc/Windchill/lib/servlet.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/lib/CounterPart.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/lib/pjl.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/lib/scmi.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/lib/wnc.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/lib/pdml.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/WtHttpClientAddOns.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/WtJmxClientConn.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/borland.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/commons-collections.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/commons-lang.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/Gantt.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/JClass.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/log4j.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/magelang.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/pvxdriver.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/sfc.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/vecmath.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/xercesImpl.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/xmlParserAPIs.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/xpath.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/JWSUtil.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/pview.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/jviews-chart-all.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/jviews-gantt-all.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/jviews-framework-all.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/lib/mpxj.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/activation.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/ie.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/ie3rdpartylibs.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/ieWeb.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/install.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/mail.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/wc3rdpartylibs.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/wncWeb.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/pdmlWeb.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/pjlWeb.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/PartsLink_L10N.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/jython.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/jdom.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/dom4j-1.5.2.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/Gantt.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/jviews-chart-all.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/jviews-framework-all.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/jviews-gantt-all.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/CounterPartWeb.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/prowtWeb.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/archiveWeb.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/archiveClientWeb.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/archiveServerWeb.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/dpimplWeb.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/InstallUtil.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/dpinfraWeb.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/json_simple-1.1.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/nexiles.tools.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase/WEB-INF/lib/nexiles.settr.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Tomcat/lib/catalina.jar
+</span><span class='line'>/Volumes/wt-vm-ptc/Windchill/codebase
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now I can just fire up the Jython interpreter like so:</p>
+
+<pre><code>$ cd develop/tmp/customer_1
+$ bin/jython
+Jython 2.5.3b1 (2.5:5fa0a5810b25, Feb 22 2012, 12:39:02) 
+[Java HotSpot(TM) 64-Bit Server VM (Apple Inc.)] on java1.6.0_31
+Type "help", "copyright", "credits" or "license" for more information.
+&gt;&gt;&gt; from wt.epm import EPMDocument
+&gt;&gt;&gt; 
+</code></pre>
+
+<p>For further improvement, I can now locally manage Java dependencies using
+<a href="http://pypi.python.org/pypi/jip" title="jip">jip</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Jython, Oracle and JDBC]]></title>
+    <link href="http://seletz.github.com/blog/2012/02/28/jython-oracle-jdbc/"/>
+    <updated>2012-02-28T08:21:00+01:00</updated>
+    <id>http://seletz.github.com/blog/2012/02/28/jython-oracle-jdbc</id>
+    <content type="html"><![CDATA[<p>I recently had the need to access a new table in an existing oracle database
+using Jython.  I needed to atomically increase a field in for <strong>one</strong> row.</p>
+
+<p>Here is what I came up with.</p>
+
+<!-- more -->
+
+
+<h2>Notes</h2>
+
+<ul>
+<li><p>The demo code relies on a existing table &#8216;NXTEST&#8217; in oracle.  I used navicat lite
+to create this table.</p></li>
+<li><p>The demo code locks a table row using &#8216;select &#8230; for update&#8217; to atomically increase
+the SEQ column.</p></li>
+<li><p>The requirement was that I could have a huge number of <code>name</code> entries,
+all slightly different, each needing a separate counter.  I did&#8217;nt want
+to create a <code>sequence</code> for each of them.</p></li>
+</ul>
+
+
+<h2>Gotchas</h2>
+
+<ul>
+<li><p>Apparently oracle <em>needs</em> upper cased table and column names.</p></li>
+<li><p>I could not get oci connections to work.  This seems to be a <a href="https://forums.oracle.com/forums/thread.jspa?threadID=1080064" title="bug in 10.2">bug in 10.2</a></p></li>
+<li><p>Because of a bug in Jython 2.5.2 wrt <code>__import__</code> I could not get
+SQLAlchemy to work.</p></li>
+</ul>
+
+
+<figure class='code'><figcaption><span>jython-oracle-jdbs.py (jdbc-oracle.py)</span> <a href='http://seletz.github.com/downloads/code/python/jdbc-oracle.py'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">with_statement</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">logging</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">com.ziclix.python.sql</span> <span class="kn">import</span> <span class="n">zxJDBC</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&quot;nexiles.wt.demo&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">setup_logging</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+</span><span class='line'>    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&quot;</span><span class="si">%(asctime)s</span><span class="s"> [</span><span class="si">%(levelname)-7s</span><span class="s">] [line </span><span class="si">%(lineno)d</span><span class="s">] </span><span class="si">%(name)s</span><span class="s">: </span><span class="si">%(message)s</span><span class="s">&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">get_connection</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+</span><span class='line'>    <span class="n">jdbc_url</span> <span class="o">=</span> <span class="s">&quot;jdbc:oracle:thin:@</span><span class="si">%(host)s</span><span class="s">:</span><span class="si">%(port)s</span><span class="s">:</span><span class="si">%(sid)s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">locals</span><span class="p">()</span>
+</span><span class='line'>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;get_connection: jdbc_url=</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">jdbc_url</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">driver</span> <span class="o">=</span> <span class="s">&quot;oracle.jdbc.driver.OracleDriver&quot;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">zxJDBC</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">jdbc_url</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">driver</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">update_sequence</span><span class="p">(</span><span class="n">cursor</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+</span><span class='line'>    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select NAME, SEQ from NXTEST where name = ? for update&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">name</span><span class="p">])</span>
+</span><span class='line'>    <span class="n">result</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+</span><span class='line'>    <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+</span><span class='line'>        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;UPDATE: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;update NXTEST set seq = seq + 1 where name = ?&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">name</span><span class="p">])</span>
+</span><span class='line'>    <span class="k">else</span><span class="p">:</span>
+</span><span class='line'>        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;CREATE: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;insert into NXTEST values (?, ?)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">name</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select NAME, SEQ from NXTEST where name = ?&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">name</span><span class="p">])</span>
+</span><span class='line'>    <span class="n">result</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+</span><span class='line'>    <span class="n">_</span><span class="p">,</span> <span class="n">seq</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span class='line'>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;NAME: </span><span class="si">%s</span><span class="s"> =&gt; SEQ </span><span class="si">%03d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">seq</span><span class="p">))</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">seq</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+</span><span class='line'>    <span class="n">username</span> <span class="o">=</span> <span class="s">&quot;****&quot;</span>
+</span><span class='line'>    <span class="n">password</span> <span class="o">=</span> <span class="s">&quot;****&quot;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">with</span> <span class="n">get_connection</span><span class="p">(</span><span class="s">&quot;example.com&quot;</span><span class="p">,</span> <span class="mi">1521</span><span class="p">,</span> <span class="s">&quot;orc4&quot;</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+</span><span class='line'>        <span class="k">with</span> <span class="n">conn</span><span class="p">:</span>
+</span><span class='line'>            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;connection: </span><span class="si">%r</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">conn</span><span class="p">)</span>
+</span><span class='line'>            <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">c</span><span class="p">:</span>
+</span><span class='line'>                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;cursor: </span><span class="si">%r</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">c</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="n">update_sequence</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s">&quot;test-foo-bar&quot;</span><span class="p">)</span>
+</span><span class='line'>                <span class="n">update_sequence</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s">&quot;test-foo-bar&quot;</span><span class="p">)</span>
+</span><span class='line'>                <span class="n">update_sequence</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s">&quot;test-bar-bar&quot;</span><span class="p">)</span>
+</span><span class='line'>                <span class="n">update_sequence</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s">&quot;test-bar-bar&quot;</span><span class="p">)</span>
+</span><span class='line'>                <span class="n">update_sequence</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s">&quot;flirz-foo-bar&quot;</span><span class="p">)</span>
+</span><span class='line'>                <span class="n">update_sequence</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s">&quot;flirz-foo-bar&quot;</span><span class="p">)</span>
+</span><span class='line'>                <span class="n">update_sequence</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s">&quot;flirz-foo-bar&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+</span><span class='line'>    <span class="n">setup_logging</span><span class="p">()</span>
+</span><span class='line'>    <span class="n">main</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Edit</h2>
+
+<p>I retested <code>SQLAlchemy</code> using the recently <a href="http://downloads.sourceforge.net/project/jython/jython-dev/2.5.3b1/jython_installer-2.5.3b1.jar" title="released">released</a> <code>Jython-2.5.3b1</code>, and
+this version indeed fixes the <code>__import__</code> bug.</p>
+
+<p>Here&#8217;s the <code>homebrew</code> recipe for it:</p>
+
+<figure class='code'><figcaption><span>jython (jython.rb)</span> <a href='http://seletz.github.com/downloads/code/ruby/jython.rb'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;formula&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">Jython</span> <span class="o">&lt;</span> <span class="no">Formula</span>
+</span><span class='line'>  <span class="n">homepage</span> <span class="s1">&#39;http://www.jython.org&#39;</span>
+</span><span class='line'>  <span class="n">url</span> <span class="s2">&quot;http://downloads.sourceforge.net/project/jython/jython-dev/2.5.3b1/jython_installer-2.5.3b1.jar&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="ss">:using</span> <span class="o">=&gt;</span> <span class="ss">:nounzip</span>
+</span><span class='line'>  <span class="n">sha1</span> <span class="s1">&#39;bcfc024a93289b2f99bf000fb7666a48fe3d32da&#39;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">install</span>
+</span><span class='line'>    <span class="nb">system</span> <span class="s2">&quot;java&quot;</span><span class="p">,</span> <span class="s2">&quot;-jar&quot;</span><span class="p">,</span> <span class="s2">&quot;jython_installer-2.5.3b1.jar&quot;</span><span class="p">,</span> <span class="s2">&quot;-s&quot;</span><span class="p">,</span> <span class="s2">&quot;-d&quot;</span><span class="p">,</span> <span class="n">libexec</span>
+</span><span class='line'>    <span class="n">bin</span><span class="o">.</span><span class="n">install_symlink</span> <span class="n">libexec</span><span class="o">+</span><span class="s1">&#39;bin/jython&#39;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>FWIW, this shows how to connect to Oracle using <code>SQLAlchemy</code> and Jython.
+Thoe code below does <strong>not</strong> do the same thing as the one above (as in
+atomic increases of the SEQ column), however.</p>
+
+<figure class='code'><figcaption><span>jython-oracle-jdbs.py (jdbc-oracle-sqlalchemy.py)</span> <a href='http://seletz.github.com/downloads/code/python/jdbc-oracle-sqlalchemy.py'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">sessionmaker</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Sequence</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Table</span><span class="p">,</span> <span class="n">Column</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">MetaData</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">mapper</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">url</span> <span class="o">=</span> <span class="s">&quot;oracle+zxjdbc://user:pass@example.com:1521/orc4&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">echo</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">metadata</span> <span class="o">=</span> <span class="n">MetaData</span><span class="p">()</span>
+</span><span class='line'><span class="n">fooversions_table</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="s">&#39;FooVersions&#39;</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span>
+</span><span class='line'>        <span class="n">Column</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">(</span><span class="s">&#39;foo_version_id_seq&#39;</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+</span><span class='line'>        <span class="n">Column</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">)),</span>
+</span><span class='line'>        <span class="n">Column</span><span class="p">(</span><span class="s">&#39;seq&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">FooVersions</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">seq</span><span class="p">):</span>
+</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">seq</span> <span class="o">=</span> <span class="n">seq</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class='line'>        <span class="k">return</span> <span class="s">&quot;&lt;FooVersions(&#39;</span><span class="si">%s</span><span class="s">&#39;,&#39;</span><span class="si">%s</span><span class="s">&#39;)&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">m</span> <span class="o">=</span> <span class="n">mapper</span><span class="p">(</span><span class="n">FooVersions</span><span class="p">,</span> <span class="n">fooversions_table</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Create Session class and bind it to the database</span>
+</span><span class='line'><span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+</span><span class='line'><span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">FooVersions</span><span class="p">(</span><span class="s">&quot;context-foo-abc&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">)</span>
+</span><span class='line'><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">FooVersions</span><span class="p">(</span><span class="s">&quot;context-foo-def&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">)</span>
+</span><span class='line'><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">FooVersions</span><span class="p">(</span><span class="s">&quot;context-foo-ghi&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Still, I see the following advantages using <code>SQLAlchemy</code> (other than having
+a pretty darn nifty ORM):</p>
+
+<ul>
+<li><p>Class Mappers.  I like these.</p></li>
+<li><p><code>SQLAlchemy</code> hides all the magic Oracle stuff (Sequences, upper cased table
+names)</p></li>
+<li><p>Minor but handy: Optionally <code>SQLAlchemy</code> logs every SQL statement.</p></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[z3c.recipe.staticlxml moved to git]]></title>
+    <link href="http://seletz.github.com/blog/2012/02/25/z3c-dot-recipe-dot-staticlxml-moved-to-git/"/>
+    <updated>2012-02-25T14:35:00+01:00</updated>
+    <id>http://seletz.github.com/blog/2012/02/25/z3c-dot-recipe-dot-staticlxml-moved-to-git</id>
+    <content type="html"><![CDATA[<p>I&#8217;ve got a request to update my buildout recipe to build a statically
+linked lxml library, I decided to move the repository to GitHub.  This way,
+people can fork my code and submit pull requests.</p>
+
+<p>As I ran into some issues during the process I did a quick writeup.</p>
+
+<!-- more -->
+
+
+<h2>Moving to git</h2>
+
+<p>First I cheked GitHub for a <a href="http://help.github.com/import-from-subversion" title="tutorial">tutorial</a> &#8211; I&#8217;m lazy.</p>
+
+<p>Then I tried to launch <code>git-svn</code> in my shell, tried to install it, until
+I remembered that the actual command is <code>git svn</code>.  D&#8217;oh.</p>
+
+<p>Then I ran into this error when importing the SVN repo:</p>
+
+<pre><code>using existing [svn-remote "svn"]
+Using higher level of URL: svn+ssh://seletz@svn.zope.org/repos/main/z3c.recipe.staticlxml =&gt; svn+ssh://seletz@svn.zope.org/repos/main
+W: Ignoring error from SVN, path probably does not exist: (160013): Filesystem has no item: File not found: revision 100, path '/z3c.recipe.staticlxml'
+W: Do not be alarmed at the above message git-svn is just searching aggressively for old history.
+This may take a while on large repositories
+r93394 = b27bb31b8e3f9048d7fbf639ebd89e6b33f47f36 (refs/remotes/trunk)
+    A   bootstrap.py
+    A   buildout.cfg
+    A   CHANGES.txt
+    A   setup.py
+    A   src/z3c/__init__.py
+    A   src/z3c/recipe/staticlxml/tests/__init__.py
+    A   src/z3c/recipe/staticlxml/tests/test_docs.py
+    A   src/z3c/recipe/staticlxml/__init__.py
+    A   src/z3c/recipe/staticlxml/README.txt
+    A   src/z3c/recipe/__init__.py
+    A   CONTRIBUTORS.txt
+    A   README.txt
+W: +empty_dir: z3c.recipe.staticlxml/trunk/downloads
+r93395 = 6898a232ff85dbfd6aff4e4f9dc959fe3b9fd443 (refs/remotes/trunk)
+    M   buildout.cfg
+    M   CHANGES.txt
+    M   src/z3c/recipe/staticlxml/__init__.py
+    M   src/z3c/recipe/staticlxml/README.txt
+r93396 = 40feb0aa5f65476cf6fa7b8722e164660dd0c4e2 (refs/remotes/trunk)
+    M   buildout.cfg
+    M   CHANGES.txt
+    M   src/z3c/recipe/staticlxml/__init__.py
+r93397 = 1155246997d81732cdcb466c0b692edcd260d231 (refs/remotes/trunk)
+    M   CHANGES.txt]
+    M   setup.py
+r93400 = 32375fd9ab8024c0f8b8ed0f40a3dad27a520a25 (refs/remotes/trunk)
+Found possible branch point: svn+ssh://seletz@svn.zope.org/repos/main/z3c.recipe.staticlxml/trunk =&gt; svn+ssh://seletz@svn.zope.org/repos/main/z3c.recipe.staticlxml/branches/0.1, 93401
+Use of uninitialized value $u in substitution (s///) at /usr/local/Cellar/git/1.7.9.1/libexec/git-core/git-svn line 2097.
+Use of uninitialized value $u in concatenation (.) or string at /usr/local/Cellar/git/1.7.9.1/libexec/git-core/git-svn line 2097.
+refs/remotes/svn/tags/0.1: 'svn+ssh://svn.zope.org/repos/main' not found in ''
+</code></pre>
+
+<p>Google reveals that this seems to be a git <a href="http://help.github.com/import-from-subversion" title="issue">issue</a>.</p>
+
+<p>So, I updated to <code>git 1.7.9.2</code>, but still the same error.  More googling, and some perl hacking
+I ended up with this diff:</p>
+
+<pre><code>--- /usr/local/Cellar/git/1.7.9.2/libexec/git-core/git-svn.orig 2012-02-25 14:52:46.000000000 +0100
++++ /usr/local/Cellar/git/1.7.9.2/libexec/git-core/git-svn  2012-02-25 14:53:46.000000000 +0100
+@@ -2094,8 +2094,12 @@
+                    " globbed: $refname\n";
+            }
+            my $u = (::cmt_metadata("$refname"))[0];
+-           $u =~ s!^\Q$url\E(/|$)!! or die
+-             "$refname: '$url' not found in '$u'\n";
++           if (!$u) {
++               $u = $pathname;
++           } else {
++               $u =~ s!^\Q$url\E(/|$)!! or die
++                 "$refname: '$url' not found in '$u'\n";
++           }
+            if ($pathname ne $u) {
+                warn "W: Refspec glob conflict ",
+                     "(ref: $refname):\n",
+</code></pre>
+
+<p>This seems to do the trick.</p>
+
+<h2>Actual Commandline To Do The Conversion</h2>
+
+<p>After hacking around the issues I got, the actual process is simple:</p>
+
+<pre><code>$ mkdir z3c.recipe.staticlxml.git
+$ cd z3c.recipe.staticlxml.git
+$ sudo gem install svn2git
+$ svn2git --verbose svn+ssh://seletz@svn.zope.org/repos/main/z3c.recipe.staticlxml
+</code></pre>
+
+<p>Then simply add the new remote and push:</p>
+
+<pre><code>$ git remote add origin git@github.com:seletz/z3c.recipe.staticlxml.git
+$ git push origin master
+</code></pre>
+
+<p>Now create a development branch:</p>
+
+<pre><code>$ git co -b develop
+$ git push origin develop
+</code></pre>
+
+<p>Now I&#8217;m ready to hack on this project.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Creating a RabbitMQ test setup with vagrant]]></title>
+    <link href="http://seletz.github.com/blog/2012/01/18/creating-a-rabbitmq-test-setup-with-vagrant/"/>
+    <updated>2012-01-18T16:00:00+01:00</updated>
+    <id>http://seletz.github.com/blog/2012/01/18/creating-a-rabbitmq-test-setup-with-vagrant</id>
+    <content type="html"><![CDATA[<p>In this post I&#8217;ll provide a writeup on how I created a test setup for
+a project I&#8217;m working on.  The project uses <a href="http://www.rabbitmq.com/" title="RabbitMQ">RabbitMQ</a> to distribute
+tasks to a worker, and the production system is a cluster of Apache/Tomcat
+machines.</p>
+
+<p>I&#8217;ll use <a href="http://vagrantup.com/" title="vagrant">vagrant</a> to create two test machines, one which runs <a href="http://www.rabbitmq.com/" title="RabbitMQ">RabbitMQ</a>, the other
+one will run the actual worker code.</p>
+
+<!-- more -->
+
+
+<h2>Preparation</h2>
+
+<p>I&#8217;ll have the <a href="http://vagrantup.com/" title="vagrant">vagrant</a> files in a subdirectory <code>vagrant</code> in my git repository.  I&#8217;ll
+add the <code>Vagrantfile</code> and all provisioning scriptzs there::</p>
+
+<pre><code>$ mkdir vagrant
+</code></pre>
+
+<p>The <code>Vagrantfile</code> looks like this::</p>
+
+<figure class='code'><figcaption><span>vagrant file (Vagrantfile-rabbitmq)</span> <a href='http://seletz.github.com/downloads/code/ruby/Vagrantfile-rabbitmq'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># -*- mode: ruby -*-</span>
+</span><span class='line'><span class="c1"># vi: set ft=ruby ts=2 sw=2 expandtab:</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Vagrant</span><span class="o">::</span><span class="no">Config</span><span class="o">.</span><span class="n">run</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">box</span> <span class="o">=</span> <span class="s2">&quot;ubuntu-natty-64&quot;</span>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">define</span> <span class="ss">:rabbitmq</span> <span class="k">do</span> <span class="o">|</span><span class="n">rabbit_config</span><span class="o">|</span>
+</span><span class='line'>    <span class="c1">#rabbit_config.vm.boot_mode = :gui</span>
+</span><span class='line'>    <span class="n">rabbit_config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">box</span>
+</span><span class='line'>    <span class="n">rabbit_config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">network</span><span class="p">(</span><span class="s2">&quot;192.168.64.10&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">rabbit_config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">provision</span> <span class="ss">:shell</span><span class="p">,</span> <span class="ss">:path</span> <span class="o">=&gt;</span> <span class="s2">&quot;rabbitmq.sh&quot;</span>
+</span><span class='line'>    <span class="n">rabbit_config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">customize</span> <span class="k">do</span> <span class="o">|</span><span class="n">vm</span><span class="o">|</span>
+</span><span class='line'>      <span class="n">vm</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;nexiles - rabbitmq&quot;</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">define</span> <span class="ss">:worker</span> <span class="k">do</span> <span class="o">|</span><span class="n">worker_config</span><span class="o">|</span>
+</span><span class='line'>    <span class="n">worker_config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">box</span>
+</span><span class='line'>    <span class="c1">#worker_config.vm.boot_mode = :gui</span>
+</span><span class='line'>    <span class="n">worker_config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">network</span><span class="p">(</span><span class="s2">&quot;192.168.64.20&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">worker_config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">provision</span> <span class="ss">:shell</span><span class="p">,</span> <span class="ss">:path</span> <span class="o">=&gt;</span> <span class="s2">&quot;worker.sh&quot;</span>
+</span><span class='line'>    <span class="n">worker_config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">share_folder</span><span class="p">(</span><span class="s2">&quot;src&quot;</span><span class="p">,</span> <span class="s2">&quot;/src&quot;</span><span class="p">,</span> <span class="s2">&quot;~/develop/nexiles/worker/src&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">worker_config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">customize</span> <span class="k">do</span> <span class="o">|</span><span class="n">vm</span><span class="o">|</span>
+</span><span class='line'>      <span class="n">vm</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;nexiles - worker&quot;</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The configuration sets the machines up, such that:</p>
+
+<ul>
+<li>both have a IP to talk to eachother</li>
+<li>on the rabbitmq machine I&#8217;ve used the shell provisioner to install
+<a href="http://www.rabbitmq.com/" title="RabbitMQ">RabbitMQ</a> 2.7.1</li>
+<li>on the worker machine I&#8217;ve used the shell provisioner to create a python
+development environment in /opt</li>
+<li>share my source folder on the worker</li>
+</ul>
+
+
+<p>Note: For some reason I wanted to have all the <a href="http://vagrantup.com/" title="vagrant">vagrant</a> stuff in a separate directory.  I
+<strong>could</strong> have put the Vagrantfile in the top-level directory and thus saved me the additional
+shared folder.  Oh well.</p>
+
+<p>Here are the provisioning shell scripts::</p>
+
+<figure class='code'><figcaption><span>rabbitmq.sh (vagrant-rabbitmq.sh)</span> <a href='http://seletz.github.com/downloads/code/shell/vagrant-rabbitmq.sh'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cat &gt;&gt; /etc/apt/sources.list <span class="s">&lt;&lt;EOT</span>
+</span><span class='line'><span class="s">deb http://www.rabbitmq.com/debian/ testing main</span>
+</span><span class='line'><span class="s">EOT</span>
+</span><span class='line'>
+</span><span class='line'>wget http://www.rabbitmq.com/rabbitmq-signing-key-public.asc
+</span><span class='line'>apt-key add rabbitmq-signing-key-public.asc
+</span><span class='line'>
+</span><span class='line'>apt-get update
+</span><span class='line'>
+</span><span class='line'>apt-get install -q -y screen htop vim curl wget
+</span><span class='line'>apt-get install -q -y rabbitmq-server
+</span><span class='line'>
+</span><span class='line'><span class="c"># RabbitMQ Plugins</span>
+</span><span class='line'>service rabbitmq-server stop
+</span><span class='line'>rabbitmq-plugins <span class="nb">enable </span>rabbitmq_management
+</span><span class='line'>rabbitmq-plugins <span class="nb">enable </span>rabbitmq_jsonrpc
+</span><span class='line'>service rabbitmq-server start
+</span><span class='line'>
+</span><span class='line'>rabbitmq-plugins list
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="c">#wget http://www.rabbitmq.com/releases/rabbitmq-server/v2.7.1/rabbitmq-server_2.7.1-1_all.deb</span>
+</span><span class='line'><span class="c">#dpkg install rabbitmq-server_2.7.1-1_all.deb</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>worker.sh (vagrant-worker.sh)</span> <a href='http://seletz.github.com/downloads/code/shell/vagrant-worker.sh'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">export </span><span class="nv">NX_HOME</span><span class="o">=</span>/opt/nexiles
+</span><span class='line'>
+</span><span class='line'>apt-get install -q -y screen htop curl wget vim
+</span><span class='line'>
+</span><span class='line'>mkdir -p <span class="nv">$NX_HOME</span>/<span class="o">{</span>bin,downloads<span class="o">}</span>
+</span><span class='line'>cat &gt; /etc/profile.d/nexiles.sh <span class="s">&lt;&lt; EOT</span>
+</span><span class='line'><span class="s">export NX_HOME=$NX_HOME</span>
+</span><span class='line'><span class="s">test -f &quot;\$NX_HOME/env.sh&quot; &amp;&amp; source \$NX_HOME/env.sh</span>
+</span><span class='line'><span class="s">EOT</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># python environment</span>
+</span><span class='line'>apt-get install -q -y python2.6
+</span><span class='line'><span class="nb">cd</span> <span class="nv">$NX_HOME</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">PYTHON</span><span class="o">=</span>/usr/bin/python2.6
+</span><span class='line'><span class="nb">export </span><span class="nv">PIP</span><span class="o">=</span>/usr/local/bin/pip
+</span><span class='line'>curl -s http://peak.telecommunity.com/dist/ez_setup.py &gt; <span class="nv">$NX_HOME</span>/downloads/ez_setup.py
+</span><span class='line'><span class="nv">$PYTHON</span> downloads/ez_setup.py -U
+</span><span class='line'>
+</span><span class='line'>easy_install-2.6 pip
+</span><span class='line'><span class="nv">$PIP</span> install virtualenv
+</span><span class='line'>
+</span><span class='line'>virtualenv -p /usr/bin/python2.6 --clear <span class="nv">$NX_HOME</span>
+</span><span class='line'>
+</span><span class='line'>. <span class="nv">$NX_HOME</span>/bin/activate
+</span><span class='line'>pip install requests
+</span><span class='line'>pip install <span class="nv">kombu</span><span class="o">==</span>1.5.1
+</span><span class='line'>
+</span><span class='line'><span class="c"># fix permissions</span>
+</span><span class='line'>chown -R vagrant <span class="nv">$NX_HOME</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Usage</h2>
+
+<p>To use the system I now just need to do a::</p>
+
+<pre><code>$ vagrant up
+</code></pre>
+
+<p>And I&#8217;m set.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Creating Vagrant Base Boxes With veewee]]></title>
@@ -24,8 +1031,6 @@ create a <a href="http://www.vagrantup.com" title="vagrant">vagrant</a> setup.</
 
 <!-- more -->
 
-
-<blockquote></blockquote>
 
 <h2>Installing to a ruby rvm gemset</h2>
 
@@ -1032,8 +2037,11 @@ I found a nice little setup on <em>github</em>: <a href="https://github.com/robb
 <pre><code>$ brew install zsh
 $ cd $HOME
 $ git clone https://github.com/robbyrussell/oh-my-zsh.git .oh-my-zsh
-$ sudo chsh -s zsh yourusernamehere
+$ sudo chsh -s /usr/local/bin/zsh yourusernamehere
 </code></pre>
+
+<p><strong>NOTE:</strong>
+  You may need to edit <code>/etc/shells</code> to have <code>/usr/local/bin/zsh</code>.</p>
 
 <h2>Configuration</h2>
 

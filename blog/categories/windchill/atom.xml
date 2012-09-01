@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: windchill | My Octopress Blog]]></title>
+  <link href="http://seletz.github.com/blog/categories/windchill/atom.xml" rel="self"/>
+  <link href="http://seletz.github.com/"/>
+  <updated>2012-07-09T11:08:59+02:00</updated>
+  <id>http://seletz.github.com/</id>
+  <author>
+    <name><![CDATA[Stefan Eletzhofer]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Clojure for Windchill Development, Part 1]]></title>
+    <link href="http://seletz.github.com/blog/2012/07/09/clojure-windchill/"/>
+    <updated>2012-07-09T10:06:00+02:00</updated>
+    <id>http://seletz.github.com/blog/2012/07/09/clojure-windchill</id>
+    <content type="html"><![CDATA[<p>I always wanted to know more about functional programming and lisp -- so I
+thought why not use <a href="http://clojure.org">Clojure</a>.  It runs on the <em>JVM</em> and I can try out some
+real-world problems with it.</p>
+
+<p>Normally I use <a href="http://jython.org">Jython</a> -- a implementation of the <a href="http://python.org">Python</a> programming
+language which runs on the <em>JVM</em> -- to develop for Windchill.</p>
+
+<p>This is the first part of a series of post's I'm going to make to log my progress.</p>
+
+<p>In this part I'll show how to <em>authenticate</em> and <em>search</em> in Windchill using Clojure.</p>
+
+<!-- more -->
+
+
+<h2>Installing</h2>
+
+<p>I use a mac, so installing Clojure is quite easy for me -- YMMV::</p>
+
+<p>```bash</p>
+
+<pre><code>$ brew install clojure
+</code></pre>
+
+<p>```</p>
+
+<h2>Running the Clojure REPL</h2>
+
+<p>That's easy, too:</p>
+
+<p>```bash</p>
+
+<pre><code>$ clj
+Clojure 1.4.0
+user=&gt; (+ 1 2)
+3
+</code></pre>
+
+<p>```</p>
+
+<h2>Installing Clojure in Windchill</h2>
+
+<p>This is quite easy, too.  Just drop the Clojure <em>jar</em> file to
+<code>$WT\_HOME/codebase/WEB-INF/lib</code>.  Then, when starting the <em>REPL</em>, be sure to
+have the <code>CLASSPATH</code> set up correctly.</p>
+
+<h2>First Steps using Windchill</h2>
+
+<p>The first Task I wanted to solve is:</p>
+
+<ul>
+<li>authenticate against Windchill using the <code>RemoteMethodServer</code></li>
+<li>search for a named <code>EPMDocument</code> using a custom-built <code>QuerySpec</code></li>
+</ul>
+
+
+<p>This is what I came up with:</p>
+
+<p>```clojure
+(import '(wt.method RemoteMethodServer)</p>
+
+<pre><code>    '(wt.epm EPMDocument)
+    '(wt.fc PersistenceHelper)
+    '(wt.query QuerySpec SearchCondition))
+</code></pre>
+
+<p>(defn authenticate [u p]
+  (doto (. RemoteMethodServer getDefault)</p>
+
+<pre><code>(.setUserName u)
+(.setPassword p)))
+</code></pre>
+
+<p>(defn sc-name [name]
+  (SearchCondition. EPMDocument (EPMDocument/NAME) "LIKE" name false))</p>
+
+<p>(defn make-query-spec [class]
+  (QuerySpec. class))</p>
+
+<p>(defn build-query-spec [name]
+  (let [qs (make-query-spec EPMDocument)]</p>
+
+<pre><code>(.appendWhere qs (sc-name name))
+qs))
+</code></pre>
+
+<p>(defn search [name]
+  (enumeration-seq</p>
+
+<pre><code>(.find PersistenceHelper/manager
+  (build-query-spec name))))
+</code></pre>
+
+<p>;; Authenticate first
+(authenticate "orgadmin" "orgadmin")</p>
+
+<p>;; Do a search for <code>k05*.asm</code>
+(def result
+  (search "k05%.asm"))</p>
+
+<p>;; and print out all the resulting objects.
+(println result)
+```</p>
+
+<p>The code is also on <a href="https://github.com/seletz/clojure-windchill">github</a>.</p>
+
+<h2>Things To Note</h2>
+
+<ul>
+<li><p>The first few lines (1..4) import Classes from the named packages to the
+current namespace.</p></li>
+<li><p>The <code>(doto instance expr)</code> special form saves quite some typing. (line 7)</p></li>
+<li><p>It took a while until I figured out how to convert the enumeration from the
+<code>QueryResult</code> to a Clojure sequence.  It's the <code>(enumeration-seq expr)</code>
+special form.  This is quite cool, as this probably means that the results
+from the search would be processed lazily, too. (line 23)</p></li>
+<li><p>I had quite some problems getting the <code>(let [...] expr)</code> special form right.
+For some reason I had one pair of parens too much and it kept evaluating a
+<code>nil</code> result from Java which caused a dreaded <code>Null Pointer Exception</code>.</p></li>
+<li><p>I started to put the <code>(authenticate ...)</code> and the imports in a <code>user.clj</code>, such that the
+<em>REPL</em> has these aitomatically loaded.</p></li>
+</ul>
+
+
+<p>Things to explore:</p>
+
+<ul>
+<li><p>Use a custom name space.  Currently, all is in the <code>user</code> name space.</p></li>
+<li><p>Use <a href="https://github.com/technomancy/leiningen/">leiningen</a> to manage dependencies.</p></li>
+<li><p>Better <a href="http://posterous.adambard.com/quickstart-clojure-on-vim-lein-slimv-windows">VIM integration</a></p></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>

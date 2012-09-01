@@ -1,0 +1,513 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Clojure for Windchill Development, Part 1 - My Octopress Blog</title>
+  <meta name="author" content="Stefan Eletzhofer">
+
+  
+  <meta name="description" content="I always wanted to know more about functional programming and lisp &#8211; so I
+thought why not use Clojure. It runs on the JVM and I can try out &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://seletz.github.com/blog/2012/07/09/clojure-windchill">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.cm/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://coderwall.com/stylesheets/jquery.coderwall.css" media="all" rel="stylesheet" type="text/css">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://coderwall.com/javascripts/jquery.coderwall.js"></script>
+
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-28179328-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">My Octopress Blog</a></h1>
+  
+    <h2>I'm no longer young but I still need the money.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:seletz.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Clojure for Windchill Development, Part 1</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-09T10:06:00+02:00" pubdate data-updated="true">2012-07-09</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>I always wanted to know more about functional programming and lisp &#8211; so I
+thought why not use <a href="http://clojure.org">Clojure</a>.  It runs on the <em>JVM</em> and I can try out some
+real-world problems with it.</p>
+
+<p>Normally I use <a href="http://jython.org">Jython</a> &#8211; a implementation of the <a href="http://python.org">Python</a> programming
+language which runs on the <em>JVM</em> &#8211; to develop for Windchill.</p>
+
+<p>This is the first part of a series of post&#8217;s I&#8217;m going to make to log my progress.</p>
+
+<p>In this part I&#8217;ll show how to <em>authenticate</em> and <em>search</em> in Windchill using Clojure.</p>
+
+<!-- more -->
+
+
+<h2>Installing</h2>
+
+<p>I use a mac, so installing Clojure is quite easy for me &#8211; YMMV::</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>    <span class="nv">$ </span>brew install clojure
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Running the Clojure REPL</h2>
+
+<p>That&#8217;s easy, too:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>clj
+</span><span class='line'>Clojure 1.4.0
+</span><span class='line'><span class="nv">user</span><span class="o">=</span>&gt; <span class="o">(</span>+ 1 2<span class="o">)</span>
+</span><span class='line'>3
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Installing Clojure in Windchill</h2>
+
+<p>This is quite easy, too.  Just drop the Clojure <em>jar</em> file to
+<code>$WT\_HOME/codebase/WEB-INF/lib</code>.  Then, when starting the <em>REPL</em>, be sure to
+have the <code>CLASSPATH</code> set up correctly.</p>
+
+<h2>First Steps using Windchill</h2>
+
+<p>The first Task I wanted to solve is:</p>
+
+<ul>
+<li>authenticate against Windchill using the <code>RemoteMethodServer</code></li>
+<li>search for a named <code>EPMDocument</code> using a custom-built <code>QuerySpec</code></li>
+</ul>
+
+
+<p>This is what I came up with:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="nb">import </span><span class="o">&#39;</span><span class="p">(</span><span class="nv">wt</span><span class="o">.</span><span class="nv">method</span> <span class="nv">RemoteMethodServer</span><span class="p">)</span>
+</span><span class='line'>        <span class="o">&#39;</span><span class="p">(</span><span class="nv">wt</span><span class="o">.</span><span class="nv">epm</span> <span class="nv">EPMDocument</span><span class="p">)</span>
+</span><span class='line'>        <span class="o">&#39;</span><span class="p">(</span><span class="nv">wt</span><span class="o">.</span><span class="nv">fc</span> <span class="nv">PersistenceHelper</span><span class="p">)</span>
+</span><span class='line'>        <span class="o">&#39;</span><span class="p">(</span><span class="nv">wt</span><span class="o">.</span><span class="nv">query</span> <span class="nv">QuerySpec</span> <span class="nv">SearchCondition</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">defn </span><span class="nv">authenticate</span> <span class="p">[</span><span class="nv">u</span> <span class="nv">p</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="nb">doto </span><span class="p">(</span><span class="o">.</span> <span class="nv">RemoteMethodServer</span> <span class="nv">getDefault</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">(</span><span class="o">.</span><span class="nv">setUserName</span> <span class="nv">u</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">(</span><span class="o">.</span><span class="nv">setPassword</span> <span class="nv">p</span><span class="p">)))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">defn </span><span class="nv">sc-name</span> <span class="p">[</span><span class="nv">name</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">SearchCondition</span><span class="o">.</span> <span class="nv">EPMDocument</span> <span class="p">(</span><span class="nf">EPMDocument/NAME</span><span class="p">)</span> <span class="s">&quot;LIKE&quot;</span> <span class="nv">name</span> <span class="nv">false</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">defn </span><span class="nv">make-query-spec</span> <span class="p">[</span><span class="nv">class</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">QuerySpec</span><span class="o">.</span> <span class="nv">class</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">defn </span><span class="nv">build-query-spec</span> <span class="p">[</span><span class="nv">name</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">qs</span> <span class="p">(</span><span class="nf">make-query-spec</span> <span class="nv">EPMDocument</span><span class="p">)]</span>
+</span><span class='line'>    <span class="p">(</span><span class="o">.</span><span class="nv">appendWhere</span> <span class="nv">qs</span> <span class="p">(</span><span class="nf">sc-name</span> <span class="nv">name</span><span class="p">))</span>
+</span><span class='line'>    <span class="nv">qs</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">defn </span><span class="nv">search</span> <span class="p">[</span><span class="nv">name</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">enumeration-seq</span>
+</span><span class='line'>    <span class="p">(</span><span class="o">.</span><span class="nv">find</span> <span class="nv">PersistenceHelper/manager</span>
+</span><span class='line'>      <span class="p">(</span><span class="nf">build-query-spec</span> <span class="nv">name</span><span class="p">))))</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; Authenticate first</span>
+</span><span class='line'><span class="p">(</span><span class="nf">authenticate</span> <span class="s">&quot;orgadmin&quot;</span> <span class="s">&quot;orgadmin&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; Do a search for `k05*.asm`</span>
+</span><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">result</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">search</span> <span class="s">&quot;k05%.asm&quot;</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; and print out all the resulting objects.</span>
+</span><span class='line'><span class="p">(</span><span class="nb">println </span><span class="nv">result</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The code is also on <a href="https://github.com/seletz/clojure-windchill">github</a>.</p>
+
+<h2>Things To Note</h2>
+
+<ul>
+<li><p>The first few lines (1..4) import Classes from the named packages to the
+current namespace.</p></li>
+<li><p>The <code>(doto instance expr)</code> special form saves quite some typing. (line 7)</p></li>
+<li><p>It took a while until I figured out how to convert the enumeration from the
+<code>QueryResult</code> to a Clojure sequence.  It&#8217;s the <code>(enumeration-seq expr)</code>
+special form.  This is quite cool, as this probably means that the results
+from the search would be processed lazily, too. (line 23)</p></li>
+<li><p>I had quite some problems getting the <code>(let [...] expr)</code> special form right.
+For some reason I had one pair of parens too much and it kept evaluating a
+<code>nil</code> result from Java which caused a dreaded <code>Null Pointer Exception</code>.</p></li>
+<li><p>I started to put the <code>(authenticate ...)</code> and the imports in a <code>user.clj</code>, such that the
+<em>REPL</em> has these aitomatically loaded.</p></li>
+</ul>
+
+
+<p>Things to explore:</p>
+
+<ul>
+<li><p>Use a custom name space.  Currently, all is in the <code>user</code> name space.</p></li>
+<li><p>Use <a href="https://github.com/technomancy/leiningen/">leiningen</a> to manage dependencies.</p></li>
+<li><p>Better <a href="http://posterous.adambard.com/quickstart-clojure-on-vim-lein-slimv-windows">VIM integration</a></p></li>
+</ul>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Stefan Eletzhofer</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-09T10:06:00+02:00" pubdate data-updated="true">2012-07-09</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/clojure/'>clojure</a>, <a class='category' href='/blog/categories/windchill/'>windchill</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://seletz.github.com/blog/2012/07/09/clojure-windchill/" data-via="seletz" data-counturl="http://seletz.github.com/blog/2012/07/09/clojure-windchill/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/04/06/jython-classpath-virtualenv/" title="Previous Post: Jython, classpath and virtualenv">&laquo; Jython, classpath and virtualenv</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/07/09/clojure-windchill/">Clojure for Windchill Development, Part 1</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/04/06/jython-classpath-virtualenv/">Jython, classpath and virtualenv</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/02/28/jython-oracle-jdbc/">Jython, Oracle and JDBC</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/02/25/z3c-dot-recipe-dot-staticlxml-moved-to-git/">z3c.recipe.staticlxml moved to git</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/01/18/creating-a-rabbitmq-test-setup-with-vagrant/">Creating a RabbitMQ test setup with vagrant</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Coderwall Badges</h1>
+  <p>
+    <script type="text/javascript">
+      function display_coderwall(args) {
+        var badges = args["data"]["badges"];
+        var wall = '';
+        for ( var i = 0; i < badges.length; i++ ) {
+          var alt_txt = badges[i]["name"];
+          var title_txt = badges[i]["name"] + ' - ' + badges[i]["description"];
+          wall += '<a href="http://coderwall.com/seletz/"><img src="'
+            + badges[i]["badge"]
+            + '" width="48" height="48" alt="' + alt_txt
+            + '" title="' + title_txt
+            + '"/></a>';
+        }
+        document.write(wall);
+      }
+    </script>
+    <script src="http://coderwall.com/seletz.json?callback=display_coderwall"></script>
+  </p>
+  
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("seletz", 4, true);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/seletz" class="twitter-follow-button" data-show-count="false">Follow @seletz</a>
+  
+</section>
+
+
+<section>
+  <h1>Github Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/seletz">@seletz</a> on Github
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'seletz',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/106477632016330375313?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 &mdash; Stefan Eletzhofer &mdash;
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span> &mdash;
+  <span class="credit"><a href="/imprint">impressum</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'seletz';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://seletz.github.com/blog/2012/07/09/clojure-windchill/';
+        var disqus_url = 'http://seletz.github.com/blog/2012/07/09/clojure-windchill/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+<!-- Place this tag where you want the badge to render -->
+<a href="https://plus.google.com/106477632016330375313?prsrc=3" rel="author" style="text-decoration:none;">
+    <img src="https://ssl.gstatic.com/images/icons/gplus-32.png" alt="" style="border:0;width:32px;height:32px;"/>
+</a>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
